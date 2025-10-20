@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "proyectoRefaccionaria (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "proyectoRefaccionaria (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
