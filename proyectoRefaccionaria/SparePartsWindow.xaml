@@ -12,7 +12,6 @@
                        FontSize="22"
                        FontWeight="Bold"/>
 
-            <!-- Lista de refacciones disponibles -->
             <ListView x:Name="PartsListView"
                       Height="150"
                       SelectionMode="Single"
@@ -27,7 +26,6 @@
                        FontWeight="Bold"
                        Margin="0,20,0,0"/>
 
-            <!-- Lista del carrito -->
             <ListView x:Name="CartListView"
                       Height="150"
                       SelectionMode="Single"

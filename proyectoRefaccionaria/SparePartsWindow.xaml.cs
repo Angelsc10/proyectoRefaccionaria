@@ -18,7 +18,6 @@ namespace proyectoRefaccionaria
         {
             this.InitializeComponent();
 
-            // Cargar refacciones disponibles
             availableParts = new List<SparePart>
             {
                 new SparePart { Id = 1, Nombre = "Filtro de aceite", Precio = 150 },
