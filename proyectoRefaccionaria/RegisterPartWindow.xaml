@@ -1,0 +1,35 @@
+<winuiEx:WindowEx
+    x:Class="proyectoRefaccionaria.RegisterPartWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winuiEx="using:WinUIEx"
+    Title="Registro de Refacciones"
+    Width="500" Height="400">
+
+    <Grid Padding="20">
+        <StackPanel Spacing="10">
+            <TextBlock Text="Registrar nueva refacción"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <TextBox x:Name="IdTextBox" Header="ID"/>
+            <TextBox x:Name="NombreTextBox" Header="Nombre de la refacción"/>
+            <TextBox x:Name="PrecioTextBox" Header="Precio"/>
+
+            <Button Content="Guardar refacción"
+                    Click="Guardar_Click"
+                    Width="200"/>
+            <Button Content="Ver refacciones registradas" 
+                    Click="VerRefacciones_Click"
+                    Width="250"
+                    Margin="0,10,0,0"/>
+
+            <TextBlock x:Name="StatusText"
+                       Foreground="Green"
+                       FontWeight="Bold"
+                       Text=""
+                       Margin="0,10,0,0"/>
+        </StackPanel>
+    </Grid>
+</winuiEx:WindowEx>

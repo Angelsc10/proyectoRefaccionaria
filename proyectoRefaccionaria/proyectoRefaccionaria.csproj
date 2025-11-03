@@ -15,7 +15,9 @@
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="RegisterPartWindow.xaml" />
     <None Remove="SparePartsWindow.xaml" />
+    <None Remove="ViewPartsWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\proyectoRefaccionaria.Core\proyectoRefaccionaria.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="ViewPartsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="RegisterPartWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

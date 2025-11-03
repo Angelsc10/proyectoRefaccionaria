@@ -1,20 +1,30 @@
-﻿<winuiex:WindowEx
+﻿<winuiEx:WindowEx
     x:Class="proyectoRefaccionaria.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:winuiex="using:WinUIEx"
-    xmlns:winui="using:Microsoft.UI.Xaml"
-    xmlns:local="using:proyectoRefaccionaria"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls">
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="320" Spacing="12">
-            <TextBlock Text="Usuario" FontSize="14"/>
-            <TextBox x:Name="UsuarioTextBox" PlaceholderText="Introduce tu usuario"/>
+    xmlns:winuiEx="using:WinUIEx"
+    Title="Inicio de Sesión"
+    Width="400" Height="350">
 
-            <TextBlock Text="Contraseña" FontSize="14"/>
-            <PasswordBox x:Name="PasswordBox" PlaceholderText="Introduce tu contraseña"/>
+    <Grid Padding="30">
+        <StackPanel VerticalAlignment="Center" Spacing="15">
+            <TextBlock Text="Iniciar Sesión"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
 
-            <Button Content="Log" Click="LogButton_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+            <TextBox x:Name="UserTextBox"
+                     Header="Usuario"
+                     PlaceholderText="Escribe tu usuario"/>
+
+            <PasswordBox x:Name="PasswordBox"
+                         Header="Contraseña"
+                         PlaceholderText="•••••"/>
+
+            <Button Content="Iniciar Sesión"
+                    Click="LogButton_Click"
+                    HorizontalAlignment="Center"
+                    Width="150"/>
         </StackPanel>
     </Grid>
-</winuiex:WindowEx>
+</winuiEx:WindowEx>
