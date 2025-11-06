@@ -1,96 +1,101 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using WinUIEx;
 
 namespace proyectoRefaccionaria
 {
     public sealed partial class RegisterPartWindow : WindowEx
     {
-        private string dataFolder = Path.Combine(AppContext.BaseDirectory, "data");
-        private string partsFile = "";
-
         public RegisterPartWindow()
         {
             this.InitializeComponent();
-            partsFile = Path.Combine(dataFolder, "parts.json");
-            Directory.CreateDirectory(dataFolder);
         }
 
+        // ✅ Guardar una nueva refacción (ACTUALIZADO CON STOCK)
         private async void Guardar_Click(object sender, RoutedEventArgs e)
         {
-            // Validar campos
-            if (string.IsNullOrWhiteSpace(IdTextBox.Text) ||
-                string.IsNullOrWhiteSpace(NombreTextBox.Text) ||
-                string.IsNullOrWhiteSpace(PrecioTextBox.Text))
+            // Validación de campos (sin cambios)
+            if (string.IsNullOrWhiteSpace(NombreTextBox.Text) || string.IsNullOrWhiteSpace(PrecioTextBox.Text))
             {
-                await MostrarDialogo("Error de validación", "Todos los campos son obligatorios.");
-                return;
-            }
-
-            if (!int.TryParse(IdTextBox.Text, out int id))
-            {
-                await MostrarDialogo("Error", "El ID debe ser un número entero.");
+                var dialog = new ContentDialog
+                {
+                    Title = "Campos incompletos",
+                    Content = "Por favor llena todos los campos.",
+                    CloseButtonText = "Aceptar",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await dialog.ShowAsync();
                 return;
             }
 
             if (!double.TryParse(PrecioTextBox.Text, out double precio))
             {
-                await MostrarDialogo("Error", "El precio debe ser un número válido.");
+                var dialog = new ContentDialog
+                {
+                    Title = "Precio inválido",
+                    Content = "El precio debe ser un número.",
+                    CloseButtonText = "Aceptar",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await dialog.ShowAsync();
                 return;
             }
 
-            // Cargar lista existente (si existe)
-            List<SparePart> parts = new();
-            if (File.Exists(partsFile))
-            {
-                string existingJson = File.ReadAllText(partsFile);
-                if (!string.IsNullOrEmpty(existingJson))
-                {
-                    parts = JsonSerializer.Deserialize<List<SparePart>>(existingJson) ?? new List<SparePart>();
-                }
-            }
+            // ⬇⬇ CAMBIO AQUÍ: Leer el stock del NumberBox ⬇⬇
+            int stock = (int)StockTextBox.Value;
 
-            // Agregar nueva refacción
-            parts.Add(new SparePart
+            var newPart = new SparePart
             {
-                Id = id,
                 Nombre = NombreTextBox.Text.Trim(),
-                Precio = precio
-            });
+                Precio = precio,
+                Stock = stock // ⬅️ AÑADIDO
+            };
 
-            // Guardar en JSON
-            string json = JsonSerializer.Serialize(parts, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(partsFile, json);
+            MySqlHelper.AddPart(newPart);
 
-            StatusText.Text = "Refacción registrada correctamente";
-
-            // Limpiar campos
-            IdTextBox.Text = "";
-            NombreTextBox.Text = "";
-            PrecioTextBox.Text = "";
-        }
-
-        private async System.Threading.Tasks.Task MostrarDialogo(string titulo, string mensaje)
-        {
-            var dialog = new ContentDialog
+            var successDialog = new ContentDialog
             {
-                Title = titulo,
-                Content = mensaje,
+                Title = "Éxito",
+                Content = "Refacción registrada correctamente.",
                 CloseButtonText = "Aceptar",
                 XamlRoot = this.Content.XamlRoot
             };
-            await dialog.ShowAsync();
+            await successDialog.ShowAsync();
+
+            // Limpiar los campos
+            NombreTextBox.Text = "";
+            PrecioTextBox.Text = "";
+            StockTextBox.Value = 0; // ⬅️ AÑADIDO
         }
 
+        // ✅ Abrir ventana de visualización (Sin cambios)
         private void VerRefacciones_Click(object sender, RoutedEventArgs e)
         {
             var viewWindow = new ViewPartsWindow();
             viewWindow.Activate();
         }
 
+        // ✅ Logout (Sin cambios)
+        private async void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Cerrar sesión",
+                Content = "¿Seguro que quieres cerrar sesión?",
+                PrimaryButtonText = "Sí",
+                CloseButtonText = "Cancelar",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                var login = new MainWindow();
+                login.Activate();
+                this.Close();
+            }
+        }
     }
 }

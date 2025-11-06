@@ -1,0 +1,48 @@
+<winuiEx:WindowEx
+    x:Class="proyectoRefaccionaria.EditPartWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winuiEx="using:WinUIEx"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    Title="Editar Refacción"
+    Width="450" Height="400">
+
+    <Grid Padding="20">
+        <StackPanel Spacing="10">
+            <TextBlock Text="Editar Refacción"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <TextBox x:Name="NombreTextBox" 
+                     Header="Nombre de la refacción"/>
+
+            <muxc:NumberBox x:Name="PrecioNumberBox"
+                            Header="Precio"
+                            Value="0"
+                            Minimum="0"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="10" />
+
+            <muxc:NumberBox x:Name="StockNumberBox"
+                            Header="Stock (Inventario)"
+                            Value="0"
+                            Minimum="0"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="10" />
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                <Button x:Name="GuardarButton" 
+                        Content="Guardar Cambios"
+                        Click="Guardar_Click"/>
+
+                <Button x:Name="CancelarButton" 
+                        Content="Cancelar"
+                        Click="Cancelar_Click"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</winuiEx:WindowEx>

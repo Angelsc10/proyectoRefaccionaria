@@ -1,178 +1,203 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq; // ⬅️ MUY IMPORTANTE AÑADIR ESTO
 using WinUIEx;
 
 namespace proyectoRefaccionaria
 {
     public sealed partial class SparePartsWindow : WindowEx
     {
-        private List<SparePart> availableParts = new();
-        private List<SparePart> cart = new();
-        private string dataFolder = Path.Combine(AppContext.BaseDirectory, "data");
-        private string partsFile = "";
+        private List<SparePart> allParts = new();
+
+        private List<CartItem> cart = new();
 
         public SparePartsWindow()
         {
             this.InitializeComponent();
-
-            partsFile = Path.Combine(dataFolder, "parts.json");
-            Directory.CreateDirectory(dataFolder);
-            LoadAvailableParts();
-
-            CartListView.ItemsSource = cart;
+            CargarRefacciones();
         }
 
-        // Load parts from JSON file
-        private void LoadAvailableParts()
+        private void CargarRefacciones()
         {
-            if (File.Exists(partsFile))
-            {
-                string json = File.ReadAllText(partsFile);
-                availableParts = JsonSerializer.Deserialize<List<SparePart>>(json) ?? new List<SparePart>();
-            }
-            else
-            {
-                availableParts = new List<SparePart>();
-            }
-
-            PartsListView.ItemsSource = availableParts;
+            allParts = MySqlHelper.GetAllParts();
+            PartsListView.ItemsSource = allParts;
         }
 
-        //  Add selected item to cart
-        private void AddToCart_Click(object sender, RoutedEventArgs e)
+        // ⬇⬇ LÓGICA DE AGREGAR AL CARRITO (ACTUALIZADA CON VERIFICACIÓN DE STOCK) ⬇⬇
+        private async void AddToCart_Click(object sender, RoutedEventArgs e)
         {
-            if (PartsListView.SelectedItem is SparePart part && !cart.Contains(part))
+            if (PartsListView.SelectedItem is SparePart selectedPart)
             {
-                cart.Add(part);
-                RefreshCart();
-                SaveCartToJson();
+                int quantityToAdd = (int)QuantityNumberBox.Value;
+
+                // 1. Buscar si el item YA existe en el carrito
+                var existingItem = cart.FirstOrDefault(item => item.Part.Id == selectedPart.Id);
+                int currentQuantityInCart = existingItem?.Quantity ?? 0;
+
+                // 2. Calcular el total que *habría* en el carrito
+                int potentialNewTotal = currentQuantityInCart + quantityToAdd;
+
+                // 3. 🛑 ¡LA VERIFICACIÓN DE STOCK! 🛑
+                if (potentialNewTotal > selectedPart.Stock)
+                {
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Stock insuficiente",
+                        Content = $"No puedes agregar {quantityToAdd} más.\n" +
+                                  $"Solo quedan {selectedPart.Stock} en inventario, y ya tienes {currentQuantityInCart} en tu carrito.",
+                        CloseButtonText = "Aceptar",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+                    await dialog.ShowAsync();
+                    return; // Detiene la función
+                }
+
+                // 4. Si hay stock, continúa como antes
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += quantityToAdd;
+                }
+                else
+                {
+                    cart.Add(new CartItem { Part = selectedPart, Quantity = quantityToAdd });
+                }
+
+                // 5. Actualiza el ListView del carrito
+                ActualizarCartListView();
             }
         }
 
-        // Remove selected item from cart
+        // LÓGICA DE QUITAR DEL CARRITO (Sin cambios)
         private void RemoveFromCart_Click(object sender, RoutedEventArgs e)
         {
-            if (CartListView.SelectedItem is SparePart part)
+            if (CartListView.SelectedItem is CartItem selectedCartItem)
             {
-                cart.Remove(part);
-                RefreshCart();
-                SaveCartToJson();
+                cart.Remove(selectedCartItem);
+                ActualizarCartListView();
             }
         }
 
-        // Confirm purchase and save ticket
+        // ⬇⬇ LÓGICA DE CONFIRMAR COMPRA (¡ACTUALIZADA PARA REDUCIR STOCK!) ⬇⬇
         private async void ConfirmPurchase_Click(object sender, RoutedEventArgs e)
         {
             if (cart.Count == 0)
             {
-                var emptyDialog = new ContentDialog
-                {
-                    Title = "Carrito vacío",
-                    Content = "No hay refacciones en el carrito.",
-                    CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
-                };
-                await emptyDialog.ShowAsync();
+                var dialog = new ContentDialog { Title = "Carrito vacío", Content = "No hay nada que comprar.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
+                await dialog.ShowAsync();
                 return;
             }
 
-            var ticket = new
+            // 1. 🛑 VERIFICACIÓN FINAL (¿Alguien compró o ajustó el stock mientras elegías?)
+            //     Volvemos a cargar los datos frescos de la BD solo para comparar.
+            var freshPartsList = MySqlHelper.GetAllParts();
+            foreach (var itemInCart in cart)
             {
-                Fecha = DateTime.Now,
-                Items = cart,
-                Total = cart.Sum(p => p.Precio)
-            };
+                var freshPart = freshPartsList.FirstOrDefault(p => p.Id == itemInCart.Part.Id);
 
-            string json = JsonSerializer.Serialize(ticket, new JsonSerializerOptions { WriteIndented = true });
-
-            string ticketPath = Path.Combine(dataFolder, "ticket.json");
-            File.WriteAllText(ticketPath, json);
-
-            string resumen = string.Join(Environment.NewLine, cart.Select(p => $"- {p.Nombre}: ${p.Precio:F2}"));
-
-            var dialog = new ContentDialog
-            {
-                Title = "Compra completada",
-                Content = $"Fecha: {ticket.Fecha}\n\nArtículos:\n{resumen}\n\nTotal: ${ticket.Total:F2}",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            await dialog.ShowAsync();
-
-            cart.Clear();
-            RefreshCart();
-            SaveCartToJson();
-        }
-
-        // Delete selected product from catalog (and update JSON)
-        private async void EliminarProducto_Click(object sender, RoutedEventArgs e)
-        {
-            if (PartsListView.SelectedItem is SparePart selectedPart)
-            {
-                var confirmDialog = new ContentDialog
+                if (freshPart == null || itemInCart.Quantity > freshPart.Stock)
                 {
-                    Title = "Confirmar eliminación",
-                    Content = $"¿Estás seguro de eliminar la refacción \"{selectedPart.Nombre}\" del catálogo?",
-                    PrimaryButtonText = "Sí, eliminar",
-                    CloseButtonText = "Cancelar",
-                    XamlRoot = this.Content.XamlRoot
-                };
-
-                var result = await confirmDialog.ShowAsync();
-
-                if (result == ContentDialogResult.Primary)
-                {
-                    availableParts.Remove(selectedPart);
-
-                    string json = JsonSerializer.Serialize(availableParts, new JsonSerializerOptions { WriteIndented = true });
-                    File.WriteAllText(partsFile, json);
-
-                    LoadAvailableParts();
-
-                    var infoDialog = new ContentDialog
+                    var errorDialog = new ContentDialog
                     {
-                        Title = "Eliminación completada",
-                        Content = $"La refacción \"{selectedPart.Nombre}\" fue eliminada correctamente.",
+                        Title = "¡Venta Fallida! Stock modificado",
+                        Content = $"Lo sentimos, mientras comprabas, el stock de '{itemInCart.Part.Nombre}' cambió. " +
+                                  $"Solo quedan {freshPart?.Stock ?? 0}. \n\nSe vaciará tu carrito. Por favor, vuelve a intentarlo.",
                         CloseButtonText = "Aceptar",
                         XamlRoot = this.Content.XamlRoot
                     };
+                    await errorDialog.ShowAsync();
 
-                    await infoDialog.ShowAsync();
+                    cart.Clear();
+                    ActualizarCartListView();
+                    CargarRefacciones(); // Recarga la lista principal con el stock real
+                    return; // Detiene la compra
                 }
             }
-            else
+
+            // 2. Si toda la validación pasa, "Confirmar" la venta (reducir el stock)
+            double total = 0;
+            foreach (var itemInCart in cart)
             {
-                var warningDialog = new ContentDialog
-                {
-                    Title = "Ninguna selección",
-                    Content = "Por favor selecciona una refacción para eliminar.",
-                    CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
-                };
-                await warningDialog.ShowAsync();
+                // Actualiza el objeto en memoria
+                itemInCart.Part.Stock -= itemInCart.Quantity;
+
+                // Manda la actualización a la Base de Datos
+                MySqlHelper.UpdatePart(itemInCart.Part);
+
+                // Suma al total
+                total += itemInCart.Subtotal;
+            }
+
+            // 3. Diálogo de éxito
+            var successDialog = new ContentDialog
+            {
+                Title = "Compra confirmada",
+                Content = $"La compra se ha registrado con éxito. Total: ${total:F2}",
+                CloseButtonText = "Aceptar",
+                XamlRoot = this.Content.XamlRoot
+            };
+            await successDialog.ShowAsync();
+
+            // 4. Limpia el carrito y recarga la lista principal (para ver el nuevo stock)
+            cart.Clear();
+            ActualizarCartListView();
+            CargarRefacciones();
+        }
+
+        // LÓGICA DE LOGOUT (Sin cambios)
+        private async void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Cerrar sesión",
+                Content = "¿Seguro que quieres cerrar sesión?",
+                PrimaryButtonText = "Sí",
+                CloseButtonText = "Cancelar",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                var login = new MainWindow();
+                login.Activate();
+                this.Close();
             }
         }
 
-
-        // Refresh cart display
-        private void RefreshCart()
+        // MÉTODO HELPER (Sin cambios)
+        private void ActualizarCartListView()
         {
-            CartListView.ItemsSource = null;
-            CartListView.ItemsSource = cart;
+            CartListView.ItemsSource = new List<CartItem>(cart);
         }
+    }
 
-        // Save current cart to JSON (cart.json)
-        private void SaveCartToJson()
+    // CLASE CartItem (Sin cambios)
+    public class CartItem
+    {
+        public SparePart Part
         {
-            string cartPath = Path.Combine(dataFolder, "cart.json");
-            string json = JsonSerializer.Serialize(cart, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(cartPath, json);
+            get; set;
+        }
+        public int Quantity
+        {
+            get; set;
+        }
+        public string DisplayName
+        {
+            get
+            {
+                return $"{Part.Nombre} (x{Quantity})";
+            }
+        }
+        public double Subtotal
+        {
+            get
+            {
+                return Part.Precio * Quantity;
+            }
         }
     }
 }
