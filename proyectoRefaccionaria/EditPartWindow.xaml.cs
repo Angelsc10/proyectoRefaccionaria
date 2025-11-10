@@ -1,24 +1,31 @@
+锘縰sing Microsoft;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using WinUIEx;
+using Microsoft.UI.Xaml.Media; // 猬咃笍 1. A脩ADE ESTA L脥NEA 'USING'
 
 namespace proyectoRefaccionaria
 {
     public sealed partial class EditPartWindow : WindowEx
     {
-        // Variable para guardar la refacci髇 que estamos editando
+        // Variable para guardar la refacci贸n que estamos editando
         private SparePart partToEdit;
 
         // Constructor MODIFICADO: Acepta una 'SparePart'
         public EditPartWindow(SparePart part)
         {
             this.InitializeComponent();
-            this.partToEdit = part; // Guarda la refacci髇
+
+            // 猬囷笍 2. A脩ADE ESTA L脥NEA
+            // Esta es la forma nativa de WinUI 3 de activar Mica
+            this.SystemBackdrop = new MicaBackdrop();
+
+            this.partToEdit = part; // Guarda la refacci贸n
             LoadData(); // Carga sus datos en la UI
         }
 
-        // Carga los datos de la refacci髇 en los campos
+        // Carga los datos de la refacci贸n en los campos
         private void LoadData()
         {
             NombreTextBox.Text = partToEdit.Nombre;
@@ -26,13 +33,13 @@ namespace proyectoRefaccionaria
             StockNumberBox.Value = partToEdit.Stock;
         }
 
-        // Bot髇 Guardar: Valida y actualiza la BD
+        // Bot贸n Guardar: Valida y actualiza la BD
         private async void Guardar_Click(object sender, RoutedEventArgs e)
         {
-            // Validaci髇 (similar a la de RegisterPartWindow)
+            // Validaci贸n (similar a la de RegisterPartWindow)
             if (string.IsNullOrWhiteSpace(NombreTextBox.Text))
             {
-                var dialog = new ContentDialog { Title = "Nombre inv醠ido", Content = "El nombre no puede estar vac韔.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
+                var dialog = new ContentDialog { Title = "Nombre inv谩lido", Content = "El nombre no puede estar vac铆o.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
                 return;
             }
@@ -48,17 +55,17 @@ namespace proyectoRefaccionaria
             // 3. Avisa al usuario y cierra
             var successDialog = new ContentDialog
             {
-                Title = "蓌ito",
-                Content = "Refacci髇 actualizada correctamente.",
+                Title = "脡xito",
+                Content = "Refacci贸n actualizada correctamente.",
                 CloseButtonText = "Aceptar",
                 XamlRoot = this.Content.XamlRoot
             };
             await successDialog.ShowAsync();
 
-            this.Close(); // Cierra la ventana de edici髇
+            this.Close(); // Cierra la ventana de edici贸n
         }
 
-        // Bot髇 Cancelar: Simplemente cierra la ventana
+        // Bot贸n Cancelar: Simplemente cierra la ventana
         private void Cancelar_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

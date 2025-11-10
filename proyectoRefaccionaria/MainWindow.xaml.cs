@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using proyectoRefaccionaria.Helpers;
 using Windows.UI.ViewManagement;
 using WinUIEx;
+using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
 
 namespace proyectoRefaccionaria
 {
@@ -16,13 +17,21 @@ namespace proyectoRefaccionaria
         {
             this.InitializeComponent();
 
-            // Si tienes un helper para AppWindow o para el icono, reinstálalo aquí cuando exista.
+            // ⬇️ 2. AÑADE ESTA LÍNEA
+            // Esta es la forma nativa de WinUI 3 de activar Mica
+            this.SystemBackdrop = new MicaBackdrop();
+
+
+            // El resto de tu código original
             // AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
 
             dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
             settings = new UISettings();
             settings.ColorValuesChanged += Settings_ColorValuesChanged;
         }
+
+        // El resto de tu archivo (Settings_ColorValuesChanged, LogButton_Click)
+        // permanece exactamente igual que en tu archivo original.
 
         private void Settings_ColorValuesChanged(UISettings sender, object args)
         {

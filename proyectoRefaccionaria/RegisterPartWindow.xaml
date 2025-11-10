@@ -3,42 +3,97 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:winuiEx="using:WinUIEx"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls" Title="Registro de Refacciones"
-    Width="500" Height="450">
-    <Grid Padding="20">
-        <StackPanel Spacing="10">
-            <TextBlock Text="Registrar nueva refacción"
-                       FontSize="22"
-                       FontWeight="Bold"
-                       Margin="0,0,0,10"/>
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls" 
+    Title="Registro de Refacciones"
+    Width="550" Height="450">
 
-            <TextBox x:Name="NombreTextBox" Header="Nombre de la refacción"/>
-            <TextBox x:Name="PrecioTextBox" Header="Precio"/>
+    <Grid Padding="25">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <muxc:NumberBox x:Name="StockTextBox"
-                            Header="Stock Inicial"
-                            Value="0"
-                            Minimum="0"
-                            SpinButtonPlacementMode="Compact"
-                            SmallChange="1"
-                            LargeChange="10" />
-            <Button Content="Guardar refacción"
+        <TextBlock Text="Registrar nueva refacción"
+                   Grid.Row="0" Grid.ColumnSpan="2"
+                   FontSize="22" FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <TextBlock Text="Nombre de la refacción:"
+                   Grid.Row="1" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <TextBox x:Name="NombreTextBox"
+                 Grid.Row="1" Grid.Column="1"
+                 PlaceholderText="Ej. Balata delantera"
+                 Margin="0,5,0,5"/>
+
+        <TextBlock Text="Precio:"
+                   Grid.Row="2" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <TextBox x:Name="PrecioTextBox"
+                 Grid.Row="2" Grid.Column="1"
+                 PlaceholderText="Ej. 150.50"
+                 Margin="0,5,0,5"/>
+
+        <TextBlock Text="Stock Inicial:"
+                   Grid.Row="3" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <muxc:NumberBox x:Name="StockTextBox"
+                        Grid.Row="3" Grid.Column="1"
+                        Value="0"
+                        Minimum="0"
+                        SpinButtonPlacementMode="Compact"
+                        SmallChange="1"
+                        LargeChange="10"
+                        Margin="0,5,0,5"/>
+
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Center"
+                    Margin="0,20,0,0">
+
+            <Button x:Name="GuardarButton"
                     Click="Guardar_Click"
-                    Width="200"/>
-            <Button Content="Ver refacciones registradas" 
+                    Style="{StaticResource AccentButtonStyle}"
+                    Width="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <SymbolIcon Symbol="Save"/>
+                    <TextBlock Text="Guardar refacción"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="VerRefaccionesButton" 
                     Click="VerRefacciones_Click"
-                    Width="250"
-                    Margin="0,10,0,0"/>
-
-            <TextBlock x:Name="StatusText"
-                       Foreground="Green"
-                       FontWeight="Bold"
-                       Text=""
-                       Margin="0,10,0,0"/>
-
-            <Button Content="Cerrar sesión / Volver" 
-                    Click="Logout_Click"
-                    Width="200"/>
+                    Width="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <SymbolIcon Symbol="ViewAll"/>
+                    <TextBlock Text="Ver refacciones"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
+
+        <Button x:Name="LogoutButton" 
+                Grid.Row="5" Grid.ColumnSpan="2" 
+                Click="Logout_Click"
+                Width="180"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <SymbolIcon Symbol="Back"/>
+                <TextBlock Text="Cerrar sesión"/>
+            </StackPanel>
+        </Button>
+
     </Grid>
 </winuiEx:WindowEx>

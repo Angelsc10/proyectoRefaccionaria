@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using WinUIEx;
+using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
 
 namespace proyectoRefaccionaria
 {
@@ -10,9 +11,14 @@ namespace proyectoRefaccionaria
         public RegisterPartWindow()
         {
             this.InitializeComponent();
+
+            // ⬇️ 2. AÑADE ESTA LÍNEA
+            // Esta es la forma nativa de WinUI 3 de activar Mica
+            this.SystemBackdrop = new MicaBackdrop();
         }
 
         // ✅ Guardar una nueva refacción (ACTUALIZADO CON STOCK)
+        //
         private async void Guardar_Click(object sender, RoutedEventArgs e)
         {
             // Validación de campos (sin cambios)
@@ -70,6 +76,7 @@ namespace proyectoRefaccionaria
         }
 
         // ✅ Abrir ventana de visualización (Sin cambios)
+        //
         private void VerRefacciones_Click(object sender, RoutedEventArgs e)
         {
             var viewWindow = new ViewPartsWindow();
@@ -77,6 +84,7 @@ namespace proyectoRefaccionaria
         }
 
         // ✅ Logout (Sin cambios)
+        //
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog

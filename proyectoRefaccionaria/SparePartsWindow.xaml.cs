@@ -4,18 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq; // ⬅️ MUY IMPORTANTE AÑADIR ESTO
 using WinUIEx;
+using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
 
 namespace proyectoRefaccionaria
 {
     public sealed partial class SparePartsWindow : WindowEx
     {
         private List<SparePart> allParts = new();
-
         private List<CartItem> cart = new();
 
         public SparePartsWindow()
         {
             this.InitializeComponent();
+
+            // ⬇️ 2. AÑADE ESTA LÍNEA
+            // Esta es la forma nativa de WinUI 3 de activar Mica
+            this.SystemBackdrop = new MicaBackdrop();
+
             CargarRefacciones();
         }
 
@@ -26,6 +31,7 @@ namespace proyectoRefaccionaria
         }
 
         // ⬇⬇ LÓGICA DE AGREGAR AL CARRITO (ACTUALIZADA CON VERIFICACIÓN DE STOCK) ⬇⬇
+        //
         private async void AddToCart_Click(object sender, RoutedEventArgs e)
         {
             if (PartsListView.SelectedItem is SparePart selectedPart)
@@ -70,6 +76,7 @@ namespace proyectoRefaccionaria
         }
 
         // LÓGICA DE QUITAR DEL CARRITO (Sin cambios)
+        //
         private void RemoveFromCart_Click(object sender, RoutedEventArgs e)
         {
             if (CartListView.SelectedItem is CartItem selectedCartItem)
@@ -80,6 +87,7 @@ namespace proyectoRefaccionaria
         }
 
         // ⬇⬇ LÓGICA DE CONFIRMAR COMPRA (¡ACTUALIZADA PARA REDUCIR STOCK!) ⬇⬇
+        //
         private async void ConfirmPurchase_Click(object sender, RoutedEventArgs e)
         {
             if (cart.Count == 0)
@@ -90,7 +98,6 @@ namespace proyectoRefaccionaria
             }
 
             // 1. 🛑 VERIFICACIÓN FINAL (¿Alguien compró o ajustó el stock mientras elegías?)
-            //     Volvemos a cargar los datos frescos de la BD solo para comparar.
             var freshPartsList = MySqlHelper.GetAllParts();
             foreach (var itemInCart in cart)
             {
@@ -146,6 +153,7 @@ namespace proyectoRefaccionaria
         }
 
         // LÓGICA DE LOGOUT (Sin cambios)
+        //
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog
@@ -168,6 +176,7 @@ namespace proyectoRefaccionaria
         }
 
         // MÉTODO HELPER (Sin cambios)
+        //
         private void ActualizarCartListView()
         {
             CartListView.ItemsSource = new List<CartItem>(cart);
@@ -175,6 +184,7 @@ namespace proyectoRefaccionaria
     }
 
     // CLASE CartItem (Sin cambios)
+    //
     public class CartItem
     {
         public SparePart Part

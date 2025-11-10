@@ -5,44 +5,83 @@
     xmlns:winuiEx="using:WinUIEx"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     Title="Editar Refacción"
-    Width="450" Height="400">
+    Width="550" Height="400">
 
-    <Grid Padding="20">
-        <StackPanel Spacing="10">
-            <TextBlock Text="Editar Refacción"
-                       FontSize="22"
-                       FontWeight="Bold"
-                       Margin="0,0,0,10"/>
+    <Grid Padding="25">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <TextBox x:Name="NombreTextBox" 
-                     Header="Nombre de la refacción"/>
+        <TextBlock Text="Editar Refacción"
+                   Grid.Row="0" Grid.ColumnSpan="2"
+                   FontSize="22" FontWeight="Bold"
+                   Margin="0,0,0,20"/>
 
-            <muxc:NumberBox x:Name="PrecioNumberBox"
-                            Header="Precio"
-                            Value="0"
-                            Minimum="0"
-                            SpinButtonPlacementMode="Compact"
-                            SmallChange="1"
-                            LargeChange="10" />
+        <TextBlock Text="Nombre de la refacción:"
+                   Grid.Row="1" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <TextBox x:Name="NombreTextBox"
+                 Grid.Row="1" Grid.Column="1"
+                 Margin="0,5,0,5"/>
 
-            <muxc:NumberBox x:Name="StockNumberBox"
-                            Header="Stock (Inventario)"
-                            Value="0"
-                            Minimum="0"
-                            SpinButtonPlacementMode="Compact"
-                            SmallChange="1"
-                            LargeChange="10" />
+        <TextBlock Text="Precio:"
+                   Grid.Row="2" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <muxc:NumberBox x:Name="PrecioNumberBox"
+                        Grid.Row="2" Grid.Column="1"
+                        Value="0" Minimum="0"
+                        SpinButtonPlacementMode="Compact"
+                        SmallChange="1"
+                        LargeChange="10"
+                        Margin="0,5,0,5"/>
 
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
-                <Button x:Name="GuardarButton" 
-                        Content="Guardar Cambios"
-                        Click="Guardar_Click"/>
+        <TextBlock Text="Stock (Inventario):"
+                   Grid.Row="3" Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,15,0"/>
+        <muxc:NumberBox x:Name="StockNumberBox"
+                        Grid.Row="3" Grid.Column="1"
+                        Value="0" Minimum="0"
+                        SpinButtonPlacementMode="Compact"
+                        SmallChange="1"
+                        LargeChange="10"
+                        Margin="0,5,0,5"/>
 
-                <Button x:Name="CancelarButton" 
-                        Content="Cancelar"
-                        Click="Cancelar_Click"/>
-            </StackPanel>
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="0,20,0,0">
 
+            <Button x:Name="GuardarButton"
+                    Click="Guardar_Click"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Width="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <SymbolIcon Symbol="Save"/>
+                    <TextBlock Text="Guardar Cambios"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="CancelarButton"
+                    Click="Cancelar_Click"
+                    Width="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <SymbolIcon Symbol="Cancel"/>
+                    <TextBlock Text="Cancelar"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </Grid>
 </winuiEx:WindowEx>

@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
+using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
 
 namespace proyectoRefaccionaria
 {
@@ -14,17 +15,23 @@ namespace proyectoRefaccionaria
         public ViewPartsWindow()
         {
             this.InitializeComponent();
+
+            // ⬇️ 2. AÑADE ESTA LÍNEA
+            // Esta es la forma nativa de WinUI 3 de activar Mica
+            this.SystemBackdrop = new MicaBackdrop();
+
             CargarRefacciones();
         }
 
-        // 🔹 Load all parts from MySQL
+        // 🔹 Carga todas las partes de MySQL
         private void CargarRefacciones()
         {
             allParts = MySqlHelper.GetAllParts();
-            PartsListView.ItemsSource = allParts;
+            // ⬇️ CAMBIO AQUÍ: Apunta al nuevo DataGrid
+            PartsDataGrid.ItemsSource = allParts;
         }
 
-        // 🔹 Filter by name or price
+        // 🔹 Filtra por nombre o precio
         private void Filtrar_Click(object sender, RoutedEventArgs e)
         {
             string filtroNombre = FiltroNombre.Text.Trim().ToLower();
@@ -35,21 +42,24 @@ namespace proyectoRefaccionaria
                 (precioMax <= 0 || p.Precio <= precioMax)
             ).ToList();
 
-            PartsListView.ItemsSource = filtrado;
+            // ⬇️ CAMBIO AQUÍ: Apunta al nuevo DataGrid
+            PartsDataGrid.ItemsSource = filtrado;
         }
 
-        // 🔹 Reset filters and show all
+        // 🔹 Resetea filtros y muestra todo
         private void MostrarTodo_Click(object sender, RoutedEventArgs e)
         {
             FiltroNombre.Text = "";
             FiltroPrecio.Text = "";
-            PartsListView.ItemsSource = allParts;
+            // ⬇️ CAMBIO AQUÍ: Apunta al nuevo DataGrid
+            PartsDataGrid.ItemsSource = allParts;
         }
 
-        // 🔹 Delete a selected record with confirmation
+        // 🔹 Elimina un registro seleccionado con confirmación
         private async void Eliminar_Click(object sender, RoutedEventArgs e)
         {
-            if (PartsListView.SelectedItem is SparePart selectedPart)
+            // ⬇️ CAMBIO AQUÍ: Apunta al nuevo DataGrid
+            if (PartsDataGrid.SelectedItem is SparePart selectedPart)
             {
                 var confirmDialog = new ContentDialog
                 {
@@ -65,7 +75,7 @@ namespace proyectoRefaccionaria
                 if (result == ContentDialogResult.Primary)
                 {
                     MySqlHelper.DeletePart(selectedPart.Id);
-                    CargarRefacciones();
+                    CargarRefacciones(); // Esto ya recarga el DataGrid
 
                     var infoDialog = new ContentDialog
                     {
@@ -90,23 +100,22 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // ⬇⬇ AÑADE ESTE MÉTODO ⬇⬇
+        // 🔹 Abre la ventana de edición
         private async void Editar_Click(object sender, RoutedEventArgs e)
         {
-            if (PartsListView.SelectedItem is SparePart selectedPart)
+            // ⬇️ CAMBIO AQUÍ: Apunta al nuevo DataGrid
+            if (PartsDataGrid.SelectedItem is SparePart selectedPart)
             {
                 // 1. Crea la nueva ventana y le pasa la refacción seleccionada
                 var editWindow = new EditPartWindow(selectedPart);
 
                 // 2. Suscríbete al evento 'Closed' de la ventana de edición.
-                //    Este código se ejecutará DESPUÉS de que 'editWindow' se cierre.
                 editWindow.Closed += (s, args) =>
                 {
-                    // 3. 'CargarRefacciones()' debe ejecutarse en el hilo
-                    //    principal de la UI. Usamos DispatcherQueue para eso.
+                    // 3. 'CargarRefacciones()' debe ejecutarse en el hilo principal
                     DispatcherQueue.TryEnqueue(() =>
                     {
-                        CargarRefacciones(); // ¡Refresca la lista!
+                        CargarRefacciones(); // ¡Refresca el DataGrid!
                     });
                 };
 

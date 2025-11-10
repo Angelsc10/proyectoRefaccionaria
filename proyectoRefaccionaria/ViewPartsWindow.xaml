@@ -1,57 +1,82 @@
 <winuiEx:WindowEx
-    xmlns:local="using:proyectoRefaccionaria"
     x:Class="proyectoRefaccionaria.ViewPartsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:winuiEx="using:WinUIEx"
+    xmlns:local="using:proyectoRefaccionaria"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     Title="Visualización y Gestión de Refacciones"
     Width="800" Height="600">
+
     <Grid Padding="20">
         <StackPanel Spacing="10">
             <TextBlock Text="Gestión de refacciones"
                        FontSize="22" FontWeight="Bold" />
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="10" 
+                        Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                        Padding="10" CornerRadius="8">
                 <TextBox x:Name="FiltroNombre" PlaceholderText="Buscar por nombre..." Width="200"/>
                 <TextBox x:Name="FiltroPrecio" PlaceholderText="Precio máximo..." Width="150"/>
-                <Button Content="Filtrar" Click="Filtrar_Click"/>
-                <Button Content="Mostrar todo" Click="MostrarTodo_Click"/>
+
+                <Button x:Name="FiltrarButton" Click="Filtrar_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Filter"/>
+                        <TextBlock Text="Filtrar"/>
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="MostrarTodoButton" Click="MostrarTodo_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Clear"/>
+                        <TextBlock Text="Mostrar todo"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
-                <Button Content="Editar refacción seleccionada"
+                <Button x:Name="EditarButton"
                         Click="Editar_Click"
-                        Width="250"/>
+                        Width="250"
+                        Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Edit"/>
+                        <TextBlock Text="Editar refacción seleccionada"/>
+                    </StackPanel>
+                </Button>
 
-                <Button Content="Eliminar refacción seleccionada"
+                <Button x:Name="EliminarButton"
                         Click="Eliminar_Click"
                         Width="250"
-                        Background="IndianRed"/>
+                        Background="IndianRed">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Delete"/>
+                        <TextBlock Text="Eliminar refacción seleccionada"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
 
 
-            <StackPanel Orientation="Horizontal" Spacing="20" Padding="12,5,5,5" Margin="0,10,0,0" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
-                <TextBlock Text="ID" Width="50" FontWeight="Bold"/>
-                <TextBlock Text="Nombre" Width="250" FontWeight="Bold"/>
-                <TextBlock Text="Precio" Width="100" FontWeight="Bold"/>
-                <TextBlock Text="Stock" Width="100" FontWeight="Bold"/>
-            </StackPanel>
+            <controls:DataGrid x:Name="PartsDataGrid"
+                   Height="350"
+                   Margin="0,10,0,0"
+                   AutoGenerateColumns="False"
+                   IsReadOnly="True"
+                   SelectionMode="Single"
+                   CanUserSortColumns="True">
+                <controls:DataGrid.Columns>
 
-            <ListView x:Name="PartsListView"
-                      Height="300"
-                      SelectionMode="Single">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="local:SparePart">
-                        <StackPanel Orientation="Horizontal" Spacing="20">
-                            <TextBlock Text="{x:Bind Id}" Width="50"/>
-                            <TextBlock Text="{x:Bind Nombre}" Width="250"/>
-                            <TextBlock Text="{x:Bind Precio, Mode=OneWay}" Width="100" TextAlignment="Right"/>
+                    <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
 
-                            <TextBlock Text="{x:Bind Stock}" Width="100" TextAlignment="Right" FontWeight="Bold"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <controls:DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+
+                    <controls:DataGridTextColumn Header="Precio" Binding="{Binding Precio}" Width="100"/>
+
+                    <controls:DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="100"/>
+
+                </controls:DataGrid.Columns>
+            </controls:DataGrid>
+
         </StackPanel>
     </Grid>
 </winuiEx:WindowEx>
