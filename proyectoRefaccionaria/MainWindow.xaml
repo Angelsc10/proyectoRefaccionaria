@@ -35,7 +35,7 @@
                              Header="Contraseña"
                              PlaceholderText="•••••"/>
 
-                <Button Content="Iniciar Sesión"
+                <Button x:Name="LoginButton" Content="Iniciar Sesión"
                         Click="LogButton_Click"
                         HorizontalAlignment="Stretch" 
                         Style="{StaticResource AccentButtonStyle}"

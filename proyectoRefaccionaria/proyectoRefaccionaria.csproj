@@ -17,7 +17,9 @@
   <ItemGroup>
     <None Remove="EditPartWindow.xaml" />
     <None Remove="RegisterPartWindow.xaml" />
+    <None Remove="SalesReportWindow.xaml" />
     <None Remove="SparePartsWindow.xaml" />
+    <None Remove="UserManagementWindow.xaml" />
     <None Remove="ViewPartsWindow.xaml" />
   </ItemGroup>
 
@@ -41,6 +43,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\proyectoRefaccionaria.Core\proyectoRefaccionaria.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UserManagementWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="SalesReportWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

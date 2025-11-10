@@ -1,0 +1,62 @@
+<winuiEx:WindowEx
+    x:Class="proyectoRefaccionaria.SalesReportWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winuiEx="using:WinUIEx"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d"
+    Title="Reporte de Ventas"
+    Width="1000" Height="600">
+
+    <Grid Padding="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,10,0">
+            <TextBlock Text="Ventas Registradas" FontSize="22" FontWeight="Bold"/>
+
+            <controls:DataGrid x:Name="VentasDataGrid"
+                               Height="450"
+                               AutoGenerateColumns="False"
+                               IsReadOnly="True"
+                               SelectionMode="Single"
+                               CanUserSortColumns="True"
+                               SelectionChanged="VentasDataGrid_SelectionChanged">
+                <controls:DataGrid.Columns>
+                    <controls:DataGridTextColumn Header="ID Venta" Binding="{Binding VentaID}" Width="100"/>
+                    <controls:DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="150"/>
+                    <controls:DataGridTextColumn Header="Total" Binding="{Binding TotalVenta}" Width="*"/>
+                </controls:DataGrid.Columns>
+            </controls:DataGrid>
+        </StackPanel>
+
+        <Border Grid.Column="1" 
+                Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                Padding="15" CornerRadius="8" Margin="10,0,0,0">
+
+            <StackPanel Spacing="10">
+                <TextBlock Text="Detalle de la Venta" FontSize="22" FontWeight="Bold"/>
+
+                <TextBlock x:Name="DetalleVentaHeader" 
+                           Text="Selecciona una venta de la izquierda para ver su detalle."
+                           TextWrapping="Wrap"/>
+
+                <controls:DataGrid x:Name="DetalleVentaDataGrid"
+                                   Height="400"
+                                   AutoGenerateColumns="False"
+                                   IsReadOnly="True">
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn Header="Producto" Binding="{Binding NombreRefaccion}" Width="*"/>
+                        <controls:DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadVendida}" Width="100"/>
+                        <controls:DataGridTextColumn Header="Precio Unit." Binding="{Binding PrecioEnLaVenta}" Width="120"/>
+                        <controls:DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal}" Width="120"/>
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</winuiEx:WindowEx>

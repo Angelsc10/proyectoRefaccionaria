@@ -6,8 +6,7 @@
     xmlns:local="using:proyectoRefaccionaria"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     Title="Visualización y Gestión de Refacciones"
-    Width="800" Height="600">
-
+    Width="900" Height="600">
     <Grid Padding="20">
         <StackPanel Spacing="10">
             <TextBlock Text="Gestión de refacciones"
@@ -19,6 +18,10 @@
                 <TextBox x:Name="FiltroNombre" PlaceholderText="Buscar por nombre..." Width="200"/>
                 <TextBox x:Name="FiltroPrecio" PlaceholderText="Precio máximo..." Width="150"/>
 
+                <ComboBox x:Name="CategoriaFilterComboBox"
+                          PlaceholderText="Filtrar por categoría"
+                          Width="180"
+                          SelectionChanged="Filtrar_Click"></ComboBox>
                 <Button x:Name="FiltrarButton" Click="Filtrar_Click">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Filter"/>
@@ -58,22 +61,18 @@
 
 
             <controls:DataGrid x:Name="PartsDataGrid"
-                   Height="350"
-                   Margin="0,10,0,0"
-                   AutoGenerateColumns="False"
-                   IsReadOnly="True"
-                   SelectionMode="Single"
-                   CanUserSortColumns="True">
+                               Height="350"
+                               Margin="0,10,0,0"
+                               AutoGenerateColumns="False"
+                               IsReadOnly="True"
+                               SelectionMode="Single"
+                               CanUserSortColumns="True">
                 <controls:DataGrid.Columns>
-
                     <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-
                     <controls:DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
-
+                    <controls:DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="150"/>
                     <controls:DataGridTextColumn Header="Precio" Binding="{Binding Precio}" Width="100"/>
-
                     <controls:DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="100"/>
-
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
 

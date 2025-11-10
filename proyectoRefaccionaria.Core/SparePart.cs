@@ -1,4 +1,5 @@
-﻿namespace proyectoRefaccionaria
+﻿// Busca este archivo (probablemente SparePart.cs)
+namespace proyectoRefaccionaria
 {
     public class SparePart
     {
@@ -17,6 +18,12 @@
         public int Stock
         {
             get; set;
+        } // Esta línea ya la tenías
+
+        // ⬇⬇ AÑADE ESTA LÍNEA ⬇⬇
+        public string Categoria
+        {
+            get; set;
         }
-    } 
+    }
 }

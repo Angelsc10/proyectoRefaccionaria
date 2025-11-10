@@ -2,7 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using WinUIEx;
-using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
+using Microsoft.UI.Xaml.Media;
 
 namespace proyectoRefaccionaria
 {
@@ -11,99 +11,80 @@ namespace proyectoRefaccionaria
         public RegisterPartWindow()
         {
             this.InitializeComponent();
-
-            // ⬇️ 2. AÑADE ESTA LÍNEA
-            // Esta es la forma nativa de WinUI 3 de activar Mica
             this.SystemBackdrop = new MicaBackdrop();
         }
 
-        // ✅ Guardar una nueva refacción (ACTUALIZADO CON STOCK)
-        //
+        // --- Método Guardar (Sin cambios) ---
         private async void Guardar_Click(object sender, RoutedEventArgs e)
         {
-            // Validación de campos (sin cambios)
             if (string.IsNullOrWhiteSpace(NombreTextBox.Text) || string.IsNullOrWhiteSpace(PrecioTextBox.Text))
             {
-                var dialog = new ContentDialog
-                {
-                    Title = "Campos incompletos",
-                    Content = "Por favor llena todos los campos.",
-                    CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
-                };
+                var dialog = new ContentDialog { Title = "Campos incompletos", Content = "Por favor llena todos los campos.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
                 return;
             }
 
             if (!double.TryParse(PrecioTextBox.Text, out double precio))
             {
-                var dialog = new ContentDialog
-                {
-                    Title = "Precio inválido",
-                    Content = "El precio debe ser un número.",
-                    CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
-                };
+                var dialog = new ContentDialog { Title = "Precio inválido", Content = "El precio debe ser un número.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
                 return;
             }
 
-            // ⬇⬇ CAMBIO AQUÍ: Leer el stock del NumberBox ⬇⬇
             int stock = (int)StockTextBox.Value;
+            string categoria = CategoriaComboBox.SelectedItem?.ToString();
 
             var newPart = new SparePart
             {
                 Nombre = NombreTextBox.Text.Trim(),
                 Precio = precio,
-                Stock = stock // ⬅️ AÑADIDO
+                Categoria = categoria,
+                Stock = stock
             };
 
             MySqlHelper.AddPart(newPart);
 
-            var successDialog = new ContentDialog
-            {
-                Title = "Éxito",
-                Content = "Refacción registrada correctamente.",
-                CloseButtonText = "Aceptar",
-                XamlRoot = this.Content.XamlRoot
-            };
+            var successDialog = new ContentDialog { Title = "Éxito", Content = "Refacción registrada correctamente.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
             await successDialog.ShowAsync();
 
-            // Limpiar los campos
             NombreTextBox.Text = "";
             PrecioTextBox.Text = "";
-            StockTextBox.Value = 0; // ⬅️ AÑADIDO
+            StockTextBox.Value = 0;
+            CategoriaComboBox.SelectedIndex = -1;
         }
 
-        // ✅ Abrir ventana de visualización (Sin cambios)
-        //
+        // --- Método Ver Refacciones (Sin cambios) ---
         private void VerRefacciones_Click(object sender, RoutedEventArgs e)
         {
             var viewWindow = new ViewPartsWindow();
             viewWindow.Activate();
         }
 
-        // ✅ Logout (Sin cambios)
-        //
+        // --- Método Ver Reportes (Sin cambios) ---
+        private void VerReportes_Click(object sender, RoutedEventArgs e)
+        {
+            var reportWindow = new SalesReportWindow();
+            reportWindow.Activate();
+        }
+
+        // --- Método Logout (Sin cambios) ---
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ContentDialog
-            {
-                Title = "Cerrar sesión",
-                Content = "¿Seguro que quieres cerrar sesión?",
-                PrimaryButtonText = "Sí",
-                CloseButtonText = "Cancelar",
-                XamlRoot = this.Content.XamlRoot
-            };
-
+            var dialog = new ContentDialog { Title = "Cerrar sesión", Content = "¿Seguro que quieres cerrar sesión?", PrimaryButtonText = "Sí", CloseButtonText = "Cancelar", XamlRoot = this.Content.XamlRoot };
             var result = await dialog.ShowAsync();
-
             if (result == ContentDialogResult.Primary)
             {
                 var login = new MainWindow();
                 login.Activate();
                 this.Close();
             }
+        }
+
+        // ⬇⬇ MÉTODO NUEVO ⬇⬇
+        private void GestionarUsuarios_Click(object sender, RoutedEventArgs e)
+        {
+            var userWindow = new UserManagementWindow(); // ¡La nueva ventana!
+            userWindow.Activate();
         }
     }
 }

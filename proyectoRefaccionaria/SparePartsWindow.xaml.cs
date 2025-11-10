@@ -2,9 +2,9 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Linq; // ⬅️ MUY IMPORTANTE AÑADIR ESTO
+using System.Linq;
 using WinUIEx;
-using Microsoft.UI.Xaml.Media; // ⬅️ 1. AÑADE ESTA LÍNEA 'USING'
+using Microsoft.UI.Xaml.Media;
 
 namespace proyectoRefaccionaria
 {
@@ -12,40 +12,73 @@ namespace proyectoRefaccionaria
     {
         private List<SparePart> allParts = new();
         private List<CartItem> cart = new();
+        private const string _mostrarTodas = "Mostrar Todas";
 
         public SparePartsWindow()
         {
             this.InitializeComponent();
-
-            // ⬇️ 2. AÑADE ESTA LÍNEA
-            // Esta es la forma nativa de WinUI 3 de activar Mica
             this.SystemBackdrop = new MicaBackdrop();
 
             CargarRefacciones();
+            PoblarFiltroCategorias();
         }
 
         private void CargarRefacciones()
         {
             allParts = MySqlHelper.GetAllParts();
-            PartsListView.ItemsSource = allParts;
+            AplicarFiltroCatalogo();
         }
 
-        // ⬇⬇ LÓGICA DE AGREGAR AL CARRITO (ACTUALIZADA CON VERIFICACIÓN DE STOCK) ⬇⬇
-        //
+        private void PoblarFiltroCategorias()
+        {
+            var categorias = allParts
+                .Select(p => p.Categoria)
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            CategoriaFilterComboBox.Items.Clear();
+            CategoriaFilterComboBox.Items.Add(_mostrarTodas);
+
+            foreach (var cat in categorias)
+            {
+                CategoriaFilterComboBox.Items.Add(cat);
+            }
+
+            CategoriaFilterComboBox.SelectedItem = _mostrarTodas;
+        }
+
+        private void CategoriaFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AplicarFiltroCatalogo();
+        }
+
+        private void AplicarFiltroCatalogo()
+        {
+            string filtroCategoria = CategoriaFilterComboBox.SelectedItem?.ToString();
+
+            if (string.IsNullOrEmpty(filtroCategoria) || filtroCategoria == _mostrarTodas)
+            {
+                PartsListView.ItemsSource = allParts;
+            }
+            else
+            {
+                var filtrado = allParts.Where(p => p.Categoria == filtroCategoria).ToList();
+                PartsListView.ItemsSource = filtrado;
+            }
+        }
+
         private async void AddToCart_Click(object sender, RoutedEventArgs e)
         {
+            // (Este método no cambia)
             if (PartsListView.SelectedItem is SparePart selectedPart)
             {
                 int quantityToAdd = (int)QuantityNumberBox.Value;
-
-                // 1. Buscar si el item YA existe en el carrito
                 var existingItem = cart.FirstOrDefault(item => item.Part.Id == selectedPart.Id);
                 int currentQuantityInCart = existingItem?.Quantity ?? 0;
-
-                // 2. Calcular el total que *habría* en el carrito
                 int potentialNewTotal = currentQuantityInCart + quantityToAdd;
 
-                // 3. 🛑 ¡LA VERIFICACIÓN DE STOCK! 🛑
                 if (potentialNewTotal > selectedPart.Stock)
                 {
                     var dialog = new ContentDialog
@@ -57,10 +90,9 @@ namespace proyectoRefaccionaria
                         XamlRoot = this.Content.XamlRoot
                     };
                     await dialog.ShowAsync();
-                    return; // Detiene la función
+                    return;
                 }
 
-                // 4. Si hay stock, continúa como antes
                 if (existingItem != null)
                 {
                     existingItem.Quantity += quantityToAdd;
@@ -69,16 +101,13 @@ namespace proyectoRefaccionaria
                 {
                     cart.Add(new CartItem { Part = selectedPart, Quantity = quantityToAdd });
                 }
-
-                // 5. Actualiza el ListView del carrito
                 ActualizarCartListView();
             }
         }
 
-        // LÓGICA DE QUITAR DEL CARRITO (Sin cambios)
-        //
         private void RemoveFromCart_Click(object sender, RoutedEventArgs e)
         {
+            // (Este método no cambia)
             if (CartListView.SelectedItem is CartItem selectedCartItem)
             {
                 cart.Remove(selectedCartItem);
@@ -86,8 +115,7 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // ⬇⬇ LÓGICA DE CONFIRMAR COMPRA (¡ACTUALIZADA PARA REDUCIR STOCK!) ⬇⬇
-        //
+        // ⬇⬇ --- MÉTODO 'CONFIRMAR COMPRA' ACTUALIZADO --- ⬇⬇
         private async void ConfirmPurchase_Click(object sender, RoutedEventArgs e)
         {
             if (cart.Count == 0)
@@ -97,12 +125,12 @@ namespace proyectoRefaccionaria
                 return;
             }
 
-            // 1. 🛑 VERIFICACIÓN FINAL (¿Alguien compró o ajustó el stock mientras elegías?)
+            // 1. 🛑 VERIFICACIÓN FINAL (Sin cambios)
+            // Sigue siendo importante para evitar que 2 personas compren lo mismo
             var freshPartsList = MySqlHelper.GetAllParts();
             foreach (var itemInCart in cart)
             {
                 var freshPart = freshPartsList.FirstOrDefault(p => p.Id == itemInCart.Part.Id);
-
                 if (freshPart == null || itemInCart.Quantity > freshPart.Stock)
                 {
                     var errorDialog = new ContentDialog
@@ -114,48 +142,55 @@ namespace proyectoRefaccionaria
                         XamlRoot = this.Content.XamlRoot
                     };
                     await errorDialog.ShowAsync();
-
                     cart.Clear();
                     ActualizarCartListView();
-                    CargarRefacciones(); // Recarga la lista principal con el stock real
-                    return; // Detiene la compra
+                    CargarRefacciones();
+                    PoblarFiltroCategorias();
+                    return;
                 }
             }
 
-            // 2. Si toda la validación pasa, "Confirmar" la venta (reducir el stock)
-            double total = 0;
-            foreach (var itemInCart in cart)
+            // 2. 🚀 Llama al Helper para que haga TODO en una transacción
+            // (Ya no actualizamos el stock aquí, el helper lo hace)
+            bool ventaRegistrada = MySqlHelper.RegistrarVenta(cart);
+
+            if (ventaRegistrada)
             {
-                // Actualiza el objeto en memoria
-                itemInCart.Part.Stock -= itemInCart.Quantity;
+                // 3. Diálogo de éxito
+                double total = cart.Sum(item => item.Subtotal); // Calcula el total solo para mostrarlo
+                var successDialog = new ContentDialog
+                {
+                    Title = "Compra confirmada",
+                    Content = $"La compra se ha registrado con éxito. Total: ${total:F2}",
+                    CloseButtonText = "Aceptar",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await successDialog.ShowAsync();
 
-                // Manda la actualización a la Base de Datos
-                MySqlHelper.UpdatePart(itemInCart.Part);
-
-                // Suma al total
-                total += itemInCart.Subtotal;
+                // 4. Limpia el carrito y recarga
+                cart.Clear();
+                ActualizarCartListView();
+                CargarRefacciones();
+                PoblarFiltroCategorias();
             }
-
-            // 3. Diálogo de éxito
-            var successDialog = new ContentDialog
+            else
             {
-                Title = "Compra confirmada",
-                Content = $"La compra se ha registrado con éxito. Total: ${total:F2}",
-                CloseButtonText = "Aceptar",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await successDialog.ShowAsync();
-
-            // 4. Limpia el carrito y recarga la lista principal (para ver el nuevo stock)
-            cart.Clear();
-            ActualizarCartListView();
-            CargarRefacciones();
+                // 5. ¡Error! La transacción falló.
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error en la Venta",
+                    Content = "No se pudo registrar la venta. La base de datos revirtió los cambios. El stock no ha sido modificado. Por favor, intenta de nuevo.",
+                    CloseButtonText = "Aceptar",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+                // No limpiamos el carrito, el usuario puede reintentar.
+            }
         }
 
-        // LÓGICA DE LOGOUT (Sin cambios)
-        //
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
+            // (Este método no cambia)
             var dialog = new ContentDialog
             {
                 Title = "Cerrar sesión",
@@ -164,9 +199,7 @@ namespace proyectoRefaccionaria
                 CloseButtonText = "Cancelar",
                 XamlRoot = this.Content.XamlRoot
             };
-
             var result = await dialog.ShowAsync();
-
             if (result == ContentDialogResult.Primary)
             {
                 var login = new MainWindow();
@@ -175,16 +208,14 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // MÉTODO HELPER (Sin cambios)
-        //
         private void ActualizarCartListView()
         {
+            // (Este método no cambia)
             CartListView.ItemsSource = new List<CartItem>(cart);
         }
     }
 
-    // CLASE CartItem (Sin cambios)
-    //
+    // (La clase CartItem no cambia)
     public class CartItem
     {
         public SparePart Part
@@ -195,19 +226,7 @@ namespace proyectoRefaccionaria
         {
             get; set;
         }
-        public string DisplayName
-        {
-            get
-            {
-                return $"{Part.Nombre} (x{Quantity})";
-            }
-        }
-        public double Subtotal
-        {
-            get
-            {
-                return Part.Precio * Quantity;
-            }
-        }
+        public string DisplayName => $"{Part.Nombre} (x{Quantity})";
+        public double Subtotal => Part.Precio * Quantity;
     }
 }

@@ -25,3 +25,75 @@ See [releases](https://github.com/microsoft/TemplateStudio/releases) and [milest
 ## Feedback
 
 Bugs and feature requests should be filed at https://aka.ms/templatestudio.
+
+# Punto de Venta para Refaccionaria (WinUI 3)
+
+Un proyecto de aplicación de escritorio completo para Windows, construido con WinUI 3 y C#, que simula un Punto de Venta (POS) y un sistema de gestión de inventario para una tienda de refacciones automotrices.
+
+![]
+
+---
+
+## 🚀 Características Principales
+
+Este proyecto va más allá de un simple CRUD y presenta un conjunto de características de nivel profesional:
+
+### 1. Sistema de Autenticación
+* **Login Seguro:** El inicio de sesión ya no está "hard-coded". Los usuarios se validan contra una tabla `Usuarios` en la base de datos.
+* **Roles de Usuario:** El sistema diferencia entre "admin" y "usuario", mostrando la ventana correspondiente para cada rol.
+
+### 2. Módulo de Administrador
+El panel de administrador es el centro de control de la tienda.
+* **Gestión de Inventario (CRUD):** Funcionalidad completa para Crear, Leer, Editar y Eliminar refacciones de la base de datos.
+* **Gestión de Usuarios:** El admin puede crear y eliminar cuentas de usuario (admin/usuario) directamente desde la aplicación.
+* **Reporte de Ventas:** Una ventana dedicada que muestra un historial de todas las ventas. Permite seleccionar un "ticket" de venta y ver un detalle de los productos vendidos en esa transacción.
+* **Categorización:** Sistema para asignar categorías a los productos (ej. "Frenos", "Motor").
+
+### 3. Módulo de Punto de Venta (POS)
+La interfaz principal para el empleado/usuario.
+* **Catálogo Filtrable:** Muestra todos los productos y permite filtrarlos por categoría.
+* **Carrito de Compras:** Un carrito de compras funcional para añadir o quitar productos.
+* **Validación de Stock en Tiempo Real:** La aplicación comprueba el stock de la base de datos *antes* de añadir un producto al carrito y una vez más *antes* de confirmar la compra, previniendo ventas de productos agotados.
+* **Integridad de Datos:** Al confirmar una compra, el sistema usa **Transacciones SQL** para asegurar que el registro de la venta y la actualización del stock ocurran juntos. Si algo falla, la operación se revierte, garantizando que la base de datos nunca quede inconsistente.
+
+### 4. Diseño y UI/UX
+* **UI Moderna:** Toda la aplicación utiliza los efectos de diseño de Windows 11, como el fondo **Mica**.
+* **Layouts Profesionales:** Se reemplazaron los `StackPanel` básicos por layouts de `Grid` para alinear formularios y crear interfaces complejas, como el POS de 2 columnas.
+* **Controles Avanzados:** Se utiliza el control `DataGrid` del Community Toolkit para mostrar listas de datos (refacciones, ventas, usuarios) que se pueden ordenar.
+* **Prevención de Errores:** Se implementó lógica para prevenir errores comunes, como el crasheo por doble clic en el botón de login.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+* **Framework:** WinUI 3 (Windows App SDK)
+* **Lenguaje:** C#
+* **Base de Datos:** MySQL
+* **Librerías Adicionales:**
+    * `WinUIEx`: Para la gestión avanzada de ventanas y el efecto Mica.
+    * `CommunityToolkit.WinUI.UI.Controls.DataGrid`: Para las cuadrículas de datos profesionales.
+    * `MySql.Data`: El conector oficial para la comunicación con la base de datos.
+
+---
+
+## 📦 Instalación y Configuración
+
+1.  **Clonar el Repositorio:**
+    ```sh
+    git clone [URL_DE_TU_REPOSITORIO]
+    ```
+2.  **Base de Datos:**
+    * Asegúrate de tener un servidor MySQL local (como XAMPP o MySQL Workbench).
+    * Crea una base de datos llamada `refaccionaria`.
+    * Ejecuta los scripts SQL (que puedes añadir a tu repositorio) para crear las tablas: `spareparts`, `Ventas`, `DetalleVenta`, y `Usuarios`.
+    * Inserta los usuarios iniciales (`admin` y `usuario`).
+3.  **Configurar Conexión:**
+    * Abre el archivo `MySqlHelper.cs`.
+    * Modifica la variable `connectionString` con tu usuario y contraseña de MySQL:
+        ```csharp
+        private static string connectionString = "server=localhost;database=refaccionaria;user=root;password=TU_CONTRASEÑA;";
+        ```
+4.  **Ejecutar:**
+    * Abre el archivo `.sln` con Visual Studio 2022.
+    * Restaura los paquetes NuGet.
+    * Compila y ejecuta el proyecto.
