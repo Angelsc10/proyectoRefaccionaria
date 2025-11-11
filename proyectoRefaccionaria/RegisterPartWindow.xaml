@@ -6,155 +6,211 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls" 
     xmlns:system="using:System"
     Title="Refaccionaria El Gallito - Panel de Admin"
-    Width="980" Height="500">
+    Width="1100" Height="700">
 
-    <Grid Padding="25" Background="{StaticResource BackgroundColorSuperDark}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Grid Background="{StaticResource BackgroundColorSuperDark}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Registrar nueva refacción"
-                   Grid.Row="0" Grid.ColumnSpan="2"
-                   FontSize="22" FontWeight="Bold"
-                   Margin="0,0,0,20"
-                   Foreground="{StaticResource PrimaryColor}"/>
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundColorDark}"
+                Padding="15,10">
+            <StackPanel Orientation="Horizontal" Spacing="15">
+                <Ellipse Width="40" Height="40">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="Assets/logo_completo.png"
+                                    Stretch="UniformToFill"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <TextBlock Text="Refaccionaria El Gallito - Panel de Administrador" 
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource PrimaryColor}"/>
+            </StackPanel>
+        </Border>
 
-        <TextBlock Text="Nombre de la refacción:"
-                   Grid.Row="1" Grid.Column="0"
-                   VerticalAlignment="Center" Margin="0,0,15,0"
-                   Foreground="{StaticResource TextColorOnAccent}"/>
-        <TextBox x:Name="NombreTextBox"
-                 Grid.Row="1" Grid.Column="1"
-                 PlaceholderText="Ej. Balata delantera" Margin="0,5,0,5"
-                 Foreground="{StaticResource TextControlForeground}"
-                 BorderBrush="{StaticResource PrimaryColor}"
-                 Background="{StaticResource BackgroundColorLight}"/>
+        <Grid Grid.Row="1" Padding="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Text="Precio:"
-                   Grid.Row="2" Grid.Column="0"
-                   VerticalAlignment="Center" Margin="0,0,15,0"
-                   Foreground="{StaticResource TextColorOnAccent}"/>
-        <TextBox x:Name="PrecioTextBox"
-                 Grid.Row="2" Grid.Column="1"
-                 PlaceholderText="Ej. 150.50" Margin="0,5,0,5"
-                 Foreground="{StaticResource TextControlForeground}"
-                 BorderBrush="{StaticResource PrimaryColor}"
-                 Background="{StaticResource BackgroundColorLight}"/>
-
-        <TextBlock Text="Categoría:"
-                   Grid.Row="3" Grid.Column="0"
-                   VerticalAlignment="Center" Margin="0,0,15,0"
-                   Foreground="{StaticResource TextColorOnAccent}"/>
-
-        <ComboBox x:Name="CategoriaComboBox"
-                  Grid.Row="3" Grid.Column="1"
-                  PlaceholderText="Selecciona una categoría" Margin="0,5,0,5" Width="Auto"
-                  Foreground="{StaticResource TextColorOnAccent}"
-                  Background="{StaticResource BackgroundColorDark}"
-                  BorderBrush="{StaticResource BackgroundColorDark}">
-                <x:String>Frenos</x:String>
-                <x:String>Motor</x:String>
-                <x:String>Suspensión</x:String>
-                <x:String>Eléctrico</x:String>
-                <x:String>General</x:String>
-        </ComboBox>
-
-        <TextBlock Text="Stock Inicial:"
-                   Grid.Row="4" Grid.Column="0"
-                   VerticalAlignment="Center" Margin="0,0,15,0"
-                   Foreground="{StaticResource TextColorOnAccent}"/>
-        <muxc:NumberBox x:Name="StockTextBox"
-                        Grid.Row="4" Grid.Column="1"
-                        Value="0" Minimum="0"
-                        SpinButtonPlacementMode="Compact"
-                        SmallChange="1" LargeChange="10" Margin="0,5,0,5"
-                        Foreground="{StaticResource TextControlForeground}"
-                        BorderBrush="{StaticResource PrimaryColor}"
-                        Background="{StaticResource BackgroundColorLight}"/>
-
-        <StackPanel Grid.Row="5" Grid.ColumnSpan="2"
-                    Orientation="Horizontal"
-                    Spacing="10"
-                    HorizontalAlignment="Center"
-                    Margin="0,20,0,0">
-
-            <Button x:Name="GuardarButton"
-                    Click="Guardar_Click"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Width="180">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <SymbolIcon Symbol="Save"/>
-                    <TextBlock Text="Guardar refacción"/>
-                </StackPanel>
-            </Button>
-
-            <Button x:Name="VerRefaccionesButton" 
-                    Click="VerRefacciones_Click"
-                    Width="180"
-                    Style="{StaticResource DefaultButtonStyle}"
+            <Border Grid.Column="0"
                     Background="{StaticResource BackgroundColorDark}"
-                    Foreground="{StaticResource TextColorOnAccent}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <SymbolIcon Symbol="ViewAll"/>
-                    <TextBlock Text="Ver refacciones"/>
-                </StackPanel>
-            </Button>
+                    Padding="15" CornerRadius="8"
+                    VerticalAlignment="Top"
+                    MinWidth="250">
 
-            <Button x:Name="VerReportesButton" 
-                    Click="VerReportes_Click"
-                    Width="180"
-                    Style="{StaticResource DefaultButtonStyle}"
-                    Background="{StaticResource BackgroundColorDark}"
-                    Foreground="{StaticResource TextColorOnAccent}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <FontIcon Glyph="&#xE9F9;"/>
-                    <TextBlock Text="Reporte de Ventas"/>
-                </StackPanel>
-            </Button>
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Panel de Opciones"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextColorOnAccent}"
+                               Margin="0,0,0,5"/>
 
-            <Button x:Name="GestionarUsuariosButton" 
-                    Click="GestionarUsuarios_Click"
-                    Width="180"
-                    Style="{StaticResource DefaultButtonStyle}"
-                    Background="{StaticResource BackgroundColorDark}"
-                    Foreground="{StaticResource TextColorOnAccent}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <SymbolIcon Symbol="People"/>
-                    <TextBlock Text="Gestionar Usuarios"/>
-                </StackPanel>
-            </Button>
+                    <Button x:Name="VerRefaccionesButton" 
+                            Click="VerRefacciones_Click"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="{StaticResource BackgroundColorSuperDark}"
+                            Foreground="{StaticResource TextColorOnAccent}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="ViewAll"/>
+                            <TextBlock Text="Ver refacciones"/>
+                        </StackPanel>
+                    </Button>
 
-            <Button x:Name="GestionarClientesButton" 
-                    Click="GestionarClientes_Click"
-                    Width="180"
-                    Style="{StaticResource DefaultButtonStyle}"
-                    Background="{StaticResource BackgroundColorDark}"
-                    Foreground="{StaticResource TextColorOnAccent}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <FontIcon Glyph="&#xE716;"/>
-                    <TextBlock Text="Gestionar Clientes"/>
+                    <Button x:Name="VerReportesButton" 
+                            Click="VerReportes_Click"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="{StaticResource BackgroundColorSuperDark}"
+                            Foreground="{StaticResource TextColorOnAccent}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE9F9;"/>
+                            <TextBlock Text="Reporte de Ventas"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="GestionarUsuariosButton" 
+                            Click="GestionarUsuarios_Click"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="{StaticResource BackgroundColorSuperDark}"
+                            Foreground="{StaticResource TextColorOnAccent}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="People"/>
+                            <TextBlock Text="Gestionar Usuarios"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="GestionarClientesButton" 
+                            Click="GestionarClientes_Click"
+                            HorizontalAlignment="Stretch"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="{StaticResource BackgroundColorSuperDark}"
+                            Foreground="{StaticResource TextColorOnAccent}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE716;"/>
+                            <TextBlock Text="Gestionar Clientes"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-            </Button>
-        </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="{StaticResource BackgroundColorDark}"
+                    Padding="25" CornerRadius="8"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center" 
+                    Margin="20,0,0,0"
+                    MinWidth="520">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" 
+                                Spacing="10" Margin="0,0,0,20">
+                        <FontIcon Glyph="&#xE71F;" Foreground="{StaticResource PrimaryColor}" FontSize="24"/>
+                        <TextBlock Text="Registrar nueva refacción"
+                                   FontSize="22" FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryColor}"/>
+                    </StackPanel>
+
+
+                    <TextBlock Text="Nombre de la refacción:"
+                               Grid.Row="1" Grid.Column="0"
+                               VerticalAlignment="Center" Margin="0,0,15,0"
+                               Foreground="#BDBDBD"/>
+                    <TextBox x:Name="NombreTextBox"
+                             Grid.Row="1" Grid.Column="1"
+                             PlaceholderText="Ej. Balata delantera" Margin="0,8,0,8"
+                             MinWidth="300"
+                             Foreground="{StaticResource TextControlForeground}"
+                             BorderBrush="{StaticResource PrimaryColor}"
+                             Background="{StaticResource BackgroundColorLight}"/>
+
+                    <TextBlock Text="Precio:"
+                               Grid.Row="2" Grid.Column="0"
+                               VerticalAlignment="Center" Margin="0,0,15,0"
+                               Foreground="#BDBDBD"/>
+                    <TextBox x:Name="PrecioTextBox"
+                             Grid.Row="2" Grid.Column="1"
+                             PlaceholderText="Ej. 150.50" Margin="0,8,0,8"
+                             Foreground="{StaticResource TextControlForeground}"
+                             BorderBrush="{StaticResource PrimaryColor}"
+                             Background="{StaticResource BackgroundColorLight}"/>
+
+                    <TextBlock Text="Categoría:"
+                               Grid.Row="3" Grid.Column="0"
+                               VerticalAlignment="Center" Margin="0,0,15,0"
+                               Foreground="#BDBDBD"/>
+                    <ComboBox x:Name="CategoriaComboBox"
+                              Grid.Row="3" Grid.Column="1"
+                              PlaceholderText="Selecciona una categoría" Margin="0,8,0,8" Width="Auto"
+                              HorizontalAlignment="Stretch"
+                              Foreground="{StaticResource TextColorOnAccent}"
+                              Background="{StaticResource BackgroundColorDark}"
+                              BorderBrush="{StaticResource BackgroundColorDark}">
+                        <x:String>Frenos</x:String>
+                        <x:String>Motor</x:String>
+                        <x:String>Suspensión</x:String>
+                        <x:String>Eléctrico</x:String>
+                        <x:String>General</x:String>
+                    </ComboBox>
+
+                    <TextBlock Text="Stock Inicial:"
+                               Grid.Row="4" Grid.Column="0"
+                               VerticalAlignment="Center" Margin="0,0,15,0"
+                               Foreground="#BDBDBD"/>
+                    <muxc:NumberBox x:Name="StockTextBox"
+                                    Grid.Row="4" Grid.Column="1"
+                                    Value="0" Minimum="0"
+                                    SpinButtonPlacementMode="Compact"
+                                    SmallChange="1" LargeChange="10" Margin="0,8,0,8"
+                                    Foreground="{StaticResource TextControlForeground}"
+                                    BorderBrush="{StaticResource PrimaryColor}"
+                                    Background="{StaticResource BackgroundColorLight}"/>
+
+                    <Button x:Name="GuardarButton"
+                            Grid.Row="5" Grid.Column="1"
+                            Click="Guardar_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,20,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="Save"/>
+                            <TextBlock Text="Guardar refacción"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+        </Grid>
 
         <Button x:Name="LogoutButton" 
-                Grid.Row="6" Grid.ColumnSpan="2" 
+                Grid.Row="2"
                 Click="Logout_Click"
-                Width="180"
-                HorizontalAlignment="Center"
+                Width="250"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
+                Margin="20"
                 Style="{StaticResource DefaultButtonStyle}"
-                Background="{StaticResource BackgroundColorDark}"
+                Background="{StaticResource BackgroundColorSuperDark}"
                 Foreground="{StaticResource TextColorOnAccent}">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <SymbolIcon Symbol="Back"/>

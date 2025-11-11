@@ -77,7 +77,17 @@ namespace proyectoRefaccionaria
         // --- Método Logout (Sin cambios) ---
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ContentDialog { Title = "Cerrar sesión", Content = "¿Seguro que quieres cerrar sesión?", PrimaryButtonText = "Sí", CloseButtonText = "Cancelar", XamlRoot = this.Content.XamlRoot };
+            var dialog = new ContentDialog
+            {
+                Title = "Cerrar sesión",
+                Content = "¿Seguro que quieres cerrar sesión?",
+                PrimaryButtonText = "Sí",
+                CloseButtonText = "Cancelar",
+
+                // ⬇⬇ ¡AÑADE ESTA LÍNEA! ⬇⬇
+                XamlRoot = this.Content.XamlRoot
+            };
+
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {

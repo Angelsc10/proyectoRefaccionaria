@@ -5,140 +5,180 @@
     xmlns:winuiEx="using:WinUIEx"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls" 
     Title="Refaccionaria El Gallito - Punto de Venta"
-    Width="900" Height="600">
+    Width="900" Height="650">
 
-    <Grid Padding="20" Background="{StaticResource BackgroundColorSuperDark}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
+    <Grid Background="{StaticResource BackgroundColorSuperDark}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,10,0">
-
-            <TextBlock Text="Catálogo de Refacciones" 
-                       FontSize="22" FontWeight="Bold" 
-                       Foreground="{StaticResource PrimaryColor}"/>
-
-            <StackPanel Orientation="Horizontal" Spacing="10" 
-                        Background="{StaticResource BackgroundColorDark}"
-                        Padding="10" CornerRadius="8">
-                <TextBlock Text="Filtrar por categoría:" VerticalAlignment="Center" 
-                           Foreground="{StaticResource TextColorOnAccent}"/>
-
-                <ComboBox x:Name="CategoriaFilterComboBox"
-                          Width="250"
-                          SelectionChanged="CategoriaFilter_SelectionChanged"
-                          Foreground="{StaticResource TextColorOnAccent}"
-                          Background="{StaticResource BackgroundColorDark}"
-                          BorderBrush="{StaticResource BackgroundColorDark}">
-                </ComboBox>
-            </StackPanel>
-
-            <ListView x:Name="PartsListView"
-                      Height="340"
-                      SelectionMode="Single"
-                      DisplayMemberPath="Nombre"
-                      Background="{StaticResource BackgroundColorDark}"
-                      Foreground="{StaticResource TextColorOnAccent}"/>
-
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <muxc:NumberBox x:Name="QuantityNumberBox"
-                                Value="1" Minimum="1"
-                                SpinButtonPlacementMode="Compact"
-                                SmallChange="1" LargeChange="5"
-                                Header="Cantidad"
-                                Width="100"
-                                Foreground="{StaticResource TextControlForeground}"
-                                BorderBrush="{StaticResource PrimaryColor}"
-                                Background="{StaticResource BackgroundColorLight}"/>
-                <Button x:Name="AddToCartButton"
-                        Click="AddToCart_Click" 
-                        Width="180"
-                        VerticalAlignment="Bottom"
-                        Style="{StaticResource AccentButtonStyle}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="Add"/>
-                        <TextBlock Text="Agregar al carrito"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </StackPanel>
-
-        <Border Grid.Column="1" 
+        <Border Grid.Row="0" 
                 Background="{StaticResource BackgroundColorDark}"
-                Padding="15" CornerRadius="8" Margin="10,0,0,0">
-
-            <StackPanel Spacing="10">
-                <TextBlock Text="Carrito de compra" 
-                           FontSize="22" FontWeight="Bold" 
-                           Foreground="{StaticResource TextColorOnAccent}"/>
-
-                <TextBlock Text="Cliente:" FontWeight="SemiBold" Margin="0,5,0,0" 
-                           Foreground="{StaticResource TextColorOnAccent}"/>
-
-                <ComboBox x:Name="ClienteComboBox"
-                          PlaceholderText="Seleccionar un cliente..."
-                          Width="Auto"
-                          Foreground="{StaticResource TextColorOnAccent}"
-                          Background="{StaticResource BackgroundColorDark}"
-                          BorderBrush="{StaticResource BackgroundColorDark}">
-                </ComboBox>
-
-                <Button x:Name="AddCustomerButton" 
-                        Click="AddCustomer_Click"
-                        HorizontalAlignment="Stretch"
-                        Style="{StaticResource DefaultButtonStyle}"
-                        Background="{StaticResource BackgroundColorSuperDark}"
-                        Foreground="{StaticResource TextColorOnAccent}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="AddFriend"/>
-                        <TextBlock Text="Añadir Cliente Nuevo..."/>
-                    </StackPanel>
-                </Button>
-
-                <ListView x:Name="CartListView"
-                          Height="190"
-                          SelectionMode="Single"
-                          DisplayMemberPath="DisplayName"
-                          Margin="0,10,0,0"
-                          Background="{StaticResource BackgroundColorDark}"
-                          Foreground="{StaticResource TextColorOnAccent}"/>
-
-                <Button x:Name="RemoveFromCartButton" 
-                        Click="RemoveFromCart_Click" 
-                        HorizontalAlignment="Stretch"
-                        Background="{StaticResource DangerColor}"
-                        Foreground="{StaticResource TextColorOnAccent}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="Remove"/>
-                        <TextBlock Text="Quitar del carrito"/>
-                    </StackPanel>
-                </Button>
-
-                <Button x:Name="ConfirmPurchaseButton" 
-                        Click="ConfirmPurchase_Click" 
-                        HorizontalAlignment="Stretch"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Margin="0,10,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="Shop"/>
-                        <TextBlock Text="Confirmar compra"/>
-                    </StackPanel>
-                </Button>
-
-                <Button x:Name="LogoutButton"
-                        Click="Logout_Click"
-                        HorizontalAlignment="Stretch"
-                        Margin="0,20,0,0"
-                        Style="{StaticResource DefaultButtonStyle}"
-                        Background="{StaticResource BackgroundColorSuperDark}"
-                        Foreground="{StaticResource TextColorOnAccent}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="Back"/>
-                        <TextBlock Text="Cerrar sesión / Volver"/>
-                    </StackPanel>
-                </Button>
+                Padding="15,10">
+            <StackPanel Orientation="Horizontal" Spacing="15">
+                <Ellipse Width="40" Height="40">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="Assets/logo_completo.png"
+                                    Stretch="UniformToFill"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <TextBlock Text="Refaccionaria El Gallito - Punto de Venta" 
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource PrimaryColor}"/>
             </StackPanel>
         </Border>
+
+        <Grid Grid.Row="1" Padding="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Catálogo de Refacciones" 
+                           FontSize="22" FontWeight="Bold" 
+                           Foreground="{StaticResource PrimaryColor}"
+                           Margin="0,0,0,10"/>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" 
+                            Background="{StaticResource BackgroundColorDark}"
+                            Padding="10" CornerRadius="8">
+                    <TextBlock Text="Filtrar por categoría:" VerticalAlignment="Center" 
+                               Foreground="{StaticResource TextColorOnAccent}"/>
+                    <ComboBox x:Name="CategoriaFilterComboBox"
+                              Width="250"
+                              SelectionChanged="CategoriaFilter_SelectionChanged"
+                              Foreground="{StaticResource TextColorOnAccent}"
+                              Background="{StaticResource BackgroundColorDark}"
+                              BorderBrush="{StaticResource BackgroundColorDark}"/>
+                </StackPanel>
+
+                <ListView x:Name="PartsListView"
+                          Grid.Row="2"
+                          SelectionMode="Single"
+                          DisplayMemberPath="Nombre"
+                          Background="{StaticResource BackgroundColorDark}"
+                          Foreground="{StaticResource TextColorOnAccent}"
+                          Margin="0,10,0,10"/>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10">
+                    <muxc:NumberBox x:Name="QuantityNumberBox"
+                                    Value="1" Minimum="1"
+                                    SpinButtonPlacementMode="Compact"
+                                    SmallChange="1" LargeChange="5"
+                                    Header="Cantidad"
+                                    Width="100"
+                                    Foreground="{StaticResource TextControlForeground}"
+                                    BorderBrush="{StaticResource PrimaryColor}"
+                                    Background="{StaticResource BackgroundColorLight}"/>
+                    <Button x:Name="AddToCartButton"
+                            Click="AddToCart_Click" 
+                            Width="180"
+                            VerticalAlignment="Bottom"
+                            Style="{StaticResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="Add"/>
+                            <TextBlock Text="Agregar al carrito"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <Border Grid.Column="1" 
+                    Background="{StaticResource BackgroundColorDark}"
+                    Padding="15" CornerRadius="8" Margin="10,0,0,0">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Carrito de compra" 
+                               FontSize="22" FontWeight="Bold" 
+                               Foreground="{StaticResource TextColorOnAccent}"
+                               Margin="0,0,0,10"/>
+
+                    <StackPanel Grid.Row="1" Spacing="10">
+                        <TextBlock Text="Cliente:" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextColorOnAccent}"/>
+                        <ComboBox x:Name="ClienteComboBox"
+                                  PlaceholderText="Seleccionar un cliente..."
+                                  Width="Auto"
+                                  Foreground="{StaticResource TextColorOnAccent}"
+                                  Background="{StaticResource BackgroundColorDark}"
+                                  BorderBrush="{StaticResource BackgroundColorDark}"/>
+                        <Button x:Name="AddCustomerButton" 
+                                Click="AddCustomer_Click"
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource DefaultButtonStyle}"
+                                Background="{StaticResource BackgroundColorSuperDark}"
+                                Foreground="{StaticResource TextColorOnAccent}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="AddFriend"/>
+                                <TextBlock Text="Añadir Cliente Nuevo..."/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <ListView x:Name="CartListView"
+                              Grid.Row="2"
+                              SelectionMode="Single"
+                              DisplayMemberPath="DisplayName"
+                              Margin="0,10,0,10"
+                              Background="{StaticResource BackgroundColorDark}"
+                              Foreground="{StaticResource TextColorOnAccent}"/>
+
+                    <StackPanel Grid.Row="3" Spacing="10">
+                        <Button x:Name="RemoveFromCartButton" 
+                                Click="RemoveFromCart_Click" 
+                                HorizontalAlignment="Stretch"
+                                Background="{StaticResource DangerColor}"
+                                Foreground="{StaticResource TextColorOnAccent}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Remove"/>
+                                <TextBlock Text="Quitar del carrito"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="ConfirmPurchaseButton" 
+                                Click="ConfirmPurchase_Click" 
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Shop"/>
+                                <TextBlock Text="Confirmar compra"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="LogoutButton"
+                                Click="Logout_Click"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,20,0,0"
+                                Style="{StaticResource DefaultButtonStyle}"
+                                Background="{StaticResource BackgroundColorSuperDark}"
+                                Foreground="{StaticResource TextColorOnAccent}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Back"/>
+                                <TextBlock Text="Cerrar sesión / Volver"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </winuiEx:WindowEx>
