@@ -1,0 +1,49 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="GallitoYellow">#FFD400</Color>
+    <Color x:Key="GallitoOrange">#FF6F00</Color>
+    <Color x:Key="GallitoOrangeDark">#D86000</Color>
+    <Color x:Key="GallitoRed">#E53935</Color>
+    <Color x:Key="GallitoGreen">#4CAF50</Color>
+    <Color x:Key="GallitoTextDark">#212121</Color>
+    <Color x:Key="GallitoTextLight">#FFFFFF</Color>
+    <Color x:Key="GallitoTextMedium">#757575</Color>
+    <Color x:Key="GallitoBgLight">#F5F5F5</Color>
+    <Color x:Key="GallitoBgDark">#333333</Color>
+    <Color x:Key="GallitoBgSuperDark">#1E1E1E</Color>
+
+    <SolidColorBrush x:Key="PrimaryColor" Color="{StaticResource GallitoYellow}"/>
+    <SolidColorBrush x:Key="AccentColor" Color="{StaticResource GallitoOrange}"/>
+    <SolidColorBrush x:Key="AccentDarkColor" Color="{StaticResource GallitoOrangeDark}"/>
+    <SolidColorBrush x:Key="DangerColor" Color="{StaticResource GallitoRed}"/>
+    <SolidColorBrush x:Key="SuccessColor" Color="{StaticResource GallitoGreen}"/>
+
+    <SolidColorBrush x:Key="TextColorPrimary" Color="{StaticResource GallitoTextDark}"/>
+    <SolidColorBrush x:Key="TextColorSecondary" Color="{StaticResource GallitoTextMedium}"/>
+    <SolidColorBrush x:Key="TextColorOnAccent" Color="{StaticResource GallitoTextLight}"/>
+
+    <SolidColorBrush x:Key="BackgroundColorLight" Color="{StaticResource GallitoBgLight}"/>
+    <SolidColorBrush x:Key="BackgroundColorDark" Color="{StaticResource GallitoBgDark}"/>
+    <SolidColorBrush x:Key="BackgroundColorSuperDark" Color="{StaticResource GallitoBgSuperDark}"/>
+
+    <SolidColorBrush x:Key="SystemFillColorCriticalBrush" Color="{StaticResource GallitoRed}"/>
+
+    <SolidColorBrush x:Key="AccentControlBackground" Color="{StaticResource GallitoOrange}"/>
+    <SolidColorBrush x:Key="AccentControlBackgroundPointerOver" Color="{StaticResource GallitoOrangeDark}"/>
+    <SolidColorBrush x:Key="AccentControlBackgroundPressed" Color="{StaticResource GallitoYellow}"/>
+    <SolidColorBrush x:Key="AccentControlForeground" Color="{StaticResource GallitoTextLight}"/>
+    <SolidColorBrush x:Key="AccentControlForegroundPointerOver" Color="{StaticResource TextColorOnAccent}"/>
+    <SolidColorBrush x:Key="AccentControlForegroundPressed" Color="{StaticResource GallitoTextDark}"/>
+
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource GallitoTextMedium}"/>
+    <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource GallitoBgLight}"/>
+    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource GallitoTextMedium}"/>
+    <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource GallitoTextDark}"/>
+    <SolidColorBrush x:Key="ListViewItemSelectedBackground" Color="{StaticResource GallitoYellow}"/>
+    <SolidColorBrush x:Key="ListViewItemSelectedForeground" Color="{StaticResource GallitoTextDark}"/>
+    <SolidColorBrush x:Key="DataGridRowSelectedBackground" Color="{StaticResource GallitoYellow}"/>
+    <SolidColorBrush x:Key="DataGridRowSelectedForeground" Color="{StaticResource GallitoTextDark}"/>
+
+</ResourceDictionary>

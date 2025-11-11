@@ -1,5 +1,5 @@
 <winuiEx:WindowEx
-    x:Class="proyectoRefaccionaria.UserManagementWindow"
+    x:Class="proyectoRefaccionaria.CustomerManagementWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:winuiEx="using:WinUIEx"
@@ -7,21 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d"
-    Title="Refaccionaria El Gallito - Usuarios"
-    Width="900" Height="500">
+    Title="Refaccionaria El Gallito - Clientes"
+    Width="1100" Height="600">
 
     <Grid Padding="20" Background="{StaticResource BackgroundColorSuperDark}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,10,0">
-            <TextBlock Text="Usuarios Existentes" FontSize="22" FontWeight="Bold"
+            <TextBlock Text="Clientes Registrados" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource PrimaryColor}"/>
 
-            <controls:DataGrid x:Name="UsuariosDataGrid"
-                               Height="350"
+            <controls:DataGrid x:Name="ClientesDataGrid"
+                               Height="450"
                                AutoGenerateColumns="False"
                                IsReadOnly="True"
                                SelectionMode="Single"
@@ -29,14 +29,16 @@
                                Background="{StaticResource BackgroundColorDark}"
                                Foreground="{StaticResource TextColorOnAccent}">
                 <controls:DataGrid.Columns>
-                    <controls:DataGridTextColumn Header="ID" Binding="{Binding UsuarioID}" Width="50"/>
-                    <controls:DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="*"/>
-                    <controls:DataGridTextColumn Header="Rol" Binding="{Binding Rol}" Width="100"/>
+                    <controls:DataGridTextColumn Header="ID" Binding="{Binding ClienteID}" Width="50"/>
+                    <controls:DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                    <controls:DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="150"/>
+                    <controls:DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180"/>
+                    <controls:DataGridTextColumn Header="RFC" Binding="{Binding RFC}" Width="150"/>
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
 
             <Button x:Name="EliminarButton"
-                    Click="EliminarUsuario_Click"
+                    Click="EliminarCliente_Click"
                     HorizontalAlignment="Right"
                     Background="{StaticResource DangerColor}"
                     Foreground="{StaticResource TextColorOnAccent}"
@@ -54,41 +56,44 @@
                 Padding="15" CornerRadius="8" Margin="10,0,0,0">
 
             <StackPanel Spacing="10">
-                <TextBlock Text="Añadir Nuevo Usuario" FontSize="22" FontWeight="Bold"
+                <TextBlock Text="Añadir Nuevo Cliente" FontSize="22" FontWeight="Bold"
                            Foreground="{StaticResource TextColorOnAccent}"/>
 
-                <TextBox x:Name="UsernameTextBox"
-                         Header="Nuevo Username:"
-                         PlaceholderText="Ej. juanperez"
+                <TextBox x:Name="NombreTextBox"
+                         Header="Nombre Completo:"
+                         PlaceholderText="Ej. Juan Pérez García"
                          Foreground="{StaticResource TextControlForeground}"
                          BorderBrush="{StaticResource PrimaryColor}"
                          Background="{StaticResource BackgroundColorLight}"/>
 
-                <PasswordBox x:Name="PasswordBox"
-                             Header="Contraseña:"
-                             PlaceholderText="•••••"
-                             Foreground="{StaticResource TextControlForeground}"
-                             BorderBrush="{StaticResource PrimaryColor}"
-                             Background="{StaticResource BackgroundColorLight}"/>
+                <TextBox x:Name="TelefonoTextBox"
+                         Header="Teléfono: (Opcional)"
+                         PlaceholderText="Ej. 8112345678"
+                         Foreground="{StaticResource TextControlForeground}"
+                         BorderBrush="{StaticResource PrimaryColor}"
+                         Background="{StaticResource BackgroundColorLight}"/>
 
-                <ComboBox x:Name="RolComboBox"
-                          Header="Rol:"
-                          PlaceholderText="Selecciona un rol"
-                          Width="Auto"
-                          Foreground="{StaticResource TextColorOnAccent}"
-                          Background="{StaticResource BackgroundColorDark}"
-                          BorderBrush="{StaticResource BackgroundColorDark}">
-                    <x:String>admin</x:String>
-                    <x:String>usuario</x:String>
-                </ComboBox>
+                <TextBox x:Name="EmailTextBox"
+                         Header="Email: (Opcional)"
+                         PlaceholderText="Ej. juan.perez@correo.com"
+                         Foreground="{StaticResource TextControlForeground}"
+                         BorderBrush="{StaticResource PrimaryColor}"
+                         Background="{StaticResource BackgroundColorLight}"/>
+
+                <TextBox x:Name="RfcTextBox"
+                         Header="RFC: (Opcional)"
+                         PlaceholderText="Ej. PEGJ800101XXX"
+                         Foreground="{StaticResource TextControlForeground}"
+                         BorderBrush="{StaticResource PrimaryColor}"
+                         Background="{StaticResource BackgroundColorLight}"/>
                 <Button x:Name="AgregarButton"
-                        Click="AgregarUsuario_Click"
+                        Click="AgregarCliente_Click"
                         Style="{StaticResource AccentButtonStyle}"
                         HorizontalAlignment="Stretch"
                         Margin="0,20,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="AddFriend"/>
-                        <TextBlock Text="Crear Usuario"/>
+                        <TextBlock Text="Crear Cliente"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

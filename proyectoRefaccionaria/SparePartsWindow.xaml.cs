@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using WinUIEx;
 using Microsoft.UI.Xaml.Media;
+using System.Text;
+using System.IO;
+using System.Diagnostics;
 
 namespace proyectoRefaccionaria
 {
@@ -13,16 +16,18 @@ namespace proyectoRefaccionaria
         private List<SparePart> allParts = new();
         private List<CartItem> cart = new();
         private const string _mostrarTodas = "Mostrar Todas";
+        private readonly Cliente _clienteAnonimo = new Cliente { ClienteID = -1, Nombre = "Cliente Anónimo (Mostrador)" };
 
         public SparePartsWindow()
         {
             this.InitializeComponent();
-            this.SystemBackdrop = new MicaBackdrop();
-
+            this.Maximize();
             CargarRefacciones();
             PoblarFiltroCategorias();
+            PoblarClientesComboBox();
         }
 
+        // --- MÉTODOS DE FILTRO DE REFACCIONES (Sin cambios) ---
         private void CargarRefacciones()
         {
             allParts = MySqlHelper.GetAllParts();
@@ -57,21 +62,56 @@ namespace proyectoRefaccionaria
         private void AplicarFiltroCatalogo()
         {
             string filtroCategoria = CategoriaFilterComboBox.SelectedItem?.ToString();
+            List<SparePart> filtrado;
 
             if (string.IsNullOrEmpty(filtroCategoria) || filtroCategoria == _mostrarTodas)
             {
-                PartsListView.ItemsSource = allParts;
+                filtrado = allParts.Where(p => p.Stock > 0).ToList();
             }
             else
             {
-                var filtrado = allParts.Where(p => p.Categoria == filtroCategoria).ToList();
-                PartsListView.ItemsSource = filtrado;
+                filtrado = allParts.Where(p => p.Categoria == filtroCategoria && p.Stock > 0).ToList();
             }
+
+            PartsListView.ItemsSource = filtrado;
         }
 
+        // --- MÉTODO NUEVO: Cargar Clientes ---
+        private void PoblarClientesComboBox()
+        {
+            List<Cliente> clientes = MySqlHelper.GetAllClientes();
+
+            ClienteComboBox.Items.Clear();
+            ClienteComboBox.Items.Add(_clienteAnonimo);
+
+            foreach (var cliente in clientes)
+            {
+                ClienteComboBox.Items.Add(cliente);
+            }
+
+            ClienteComboBox.SelectedItem = _clienteAnonimo;
+        }
+
+        // --- MÉTODO NUEVO: Botón Añadir Cliente ---
+        private void AddCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            var customerWindow = new CustomerManagementWindow();
+
+            customerWindow.Closed += (s, args) =>
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    PoblarClientesComboBox();
+                });
+            };
+
+            customerWindow.Activate();
+        }
+
+
+        // --- MÉTODOS DEL CARRITO (Sin cambios) ---
         private async void AddToCart_Click(object sender, RoutedEventArgs e)
         {
-            // (Este método no cambia)
             if (PartsListView.SelectedItem is SparePart selectedPart)
             {
                 int quantityToAdd = (int)QuantityNumberBox.Value;
@@ -87,7 +127,7 @@ namespace proyectoRefaccionaria
                         Content = $"No puedes agregar {quantityToAdd} más.\n" +
                                   $"Solo quedan {selectedPart.Stock} en inventario, y ya tienes {currentQuantityInCart} en tu carrito.",
                         CloseButtonText = "Aceptar",
-                        XamlRoot = this.Content.XamlRoot
+                        XamlRoot = this.Content.XamlRoot // ⬅️ Este diálogo SÍ lo tenía
                     };
                     await dialog.ShowAsync();
                     return;
@@ -107,7 +147,6 @@ namespace proyectoRefaccionaria
 
         private void RemoveFromCart_Click(object sender, RoutedEventArgs e)
         {
-            // (Este método no cambia)
             if (CartListView.SelectedItem is CartItem selectedCartItem)
             {
                 cart.Remove(selectedCartItem);
@@ -115,7 +154,7 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // ⬇⬇ --- MÉTODO 'CONFIRMAR COMPRA' ACTUALIZADO --- ⬇⬇
+        // --- MÉTODO 'CONFIRMAR COMPRA' (MODIFICADO) ---
         private async void ConfirmPurchase_Click(object sender, RoutedEventArgs e)
         {
             if (cart.Count == 0)
@@ -125,22 +164,13 @@ namespace proyectoRefaccionaria
                 return;
             }
 
-            // 1. 🛑 VERIFICACIÓN FINAL (Sin cambios)
-            // Sigue siendo importante para evitar que 2 personas compren lo mismo
             var freshPartsList = MySqlHelper.GetAllParts();
             foreach (var itemInCart in cart)
             {
                 var freshPart = freshPartsList.FirstOrDefault(p => p.Id == itemInCart.Part.Id);
                 if (freshPart == null || itemInCart.Quantity > freshPart.Stock)
                 {
-                    var errorDialog = new ContentDialog
-                    {
-                        Title = "¡Venta Fallida! Stock modificado",
-                        Content = $"Lo sentimos, mientras comprabas, el stock de '{itemInCart.Part.Nombre}' cambió. " +
-                                  $"Solo quedan {freshPart?.Stock ?? 0}. \n\nSe vaciará tu carrito. Por favor, vuelve a intentarlo.",
-                        CloseButtonText = "Aceptar",
-                        XamlRoot = this.Content.XamlRoot
-                    };
+                    var errorDialog = new ContentDialog { Title = "¡Venta Fallida! Stock modificado", Content = $"Lo sentimos, mientras comprabas, el stock de '{itemInCart.Part.Nombre}' cambió. " + $"Solo quedan {freshPart?.Stock ?? 0}. \n\nSe vaciará tu carrito. Por favor, vuelve a intentarlo.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                     await errorDialog.ShowAsync();
                     cart.Clear();
                     ActualizarCartListView();
@@ -150,53 +180,97 @@ namespace proyectoRefaccionaria
                 }
             }
 
-            // 2. 🚀 Llama al Helper para que haga TODO en una transacción
-            // (Ya no actualizamos el stock aquí, el helper lo hace)
-            bool ventaRegistrada = MySqlHelper.RegistrarVenta(cart);
+            int clienteIdParaVenta = -1;
+            string nombreCliente = _clienteAnonimo.Nombre;
 
-            if (ventaRegistrada)
+            if (ClienteComboBox.SelectedItem is Cliente selectedCliente)
             {
-                // 3. Diálogo de éxito
-                double total = cart.Sum(item => item.Subtotal); // Calcula el total solo para mostrarlo
+                clienteIdParaVenta = selectedCliente.ClienteID;
+                nombreCliente = selectedCliente.Nombre;
+            }
+
+            int ventaId = MySqlHelper.RegistrarVenta(cart, clienteIdParaVenta);
+
+            if (ventaId > -1)
+            {
+                double total = cart.Sum(item => item.Subtotal);
+                string ticketPath = GenerarTicket(cart, ventaId, total, nombreCliente);
+
                 var successDialog = new ContentDialog
                 {
                     Title = "Compra confirmada",
-                    Content = $"La compra se ha registrado con éxito. Total: ${total:F2}",
+                    Content = $"La compra (Venta ID: {ventaId}) para {nombreCliente} se ha registrado con éxito. Total: ${total:F2}\n\nSe guardó un ticket en: {ticketPath}",
                     CloseButtonText = "Aceptar",
                     XamlRoot = this.Content.XamlRoot
                 };
                 await successDialog.ShowAsync();
 
-                // 4. Limpia el carrito y recarga
                 cart.Clear();
                 ActualizarCartListView();
                 CargarRefacciones();
                 PoblarFiltroCategorias();
+                PoblarClientesComboBox();
             }
             else
             {
-                // 5. ¡Error! La transacción falló.
-                var errorDialog = new ContentDialog
-                {
-                    Title = "Error en la Venta",
-                    Content = "No se pudo registrar la venta. La base de datos revirtió los cambios. El stock no ha sido modificado. Por favor, intenta de nuevo.",
-                    CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
-                };
+                var errorDialog = new ContentDialog { Title = "Error en la Venta", Content = "No se pudo registrar la venta. La base de datos revirtió los cambios. El stock no ha sido modificado. Por favor, intenta de nuevo.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await errorDialog.ShowAsync();
-                // No limpiamos el carrito, el usuario puede reintentar.
             }
         }
 
+        private string GenerarTicket(List<CartItem> carrito, int ventaId, double total, string nombreCliente)
+        {
+            string fileName = $"Venta_{ventaId}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = Path.Combine(desktopPath, fileName);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("*************************************");
+            sb.AppendLine("      REFACCIONARIA EL GALLITO     ");
+            sb.AppendLine("*************************************");
+            sb.AppendLine($"Venta ID: {ventaId}");
+            sb.AppendLine($"Fecha: {DateTime.Now:g}");
+            sb.AppendLine($"Cliente: {nombreCliente}");
+            sb.AppendLine("-------------------------------------");
+            sb.AppendLine("Cant.  Producto              Subtotal");
+            sb.AppendLine("-------------------------------------");
+
+            foreach (var item in carrito)
+            {
+                string nombre = item.Part.Nombre.Length > 20 ? item.Part.Nombre.Substring(0, 20) : item.Part.Nombre.PadRight(20);
+                string cantidad = item.Quantity.ToString().PadLeft(3);
+                string subtotal = item.Subtotal.ToString("C2").PadLeft(10);
+
+                sb.AppendLine($"{cantidad}   {nombre}  {subtotal}");
+            }
+
+            sb.AppendLine("-------------------------------------");
+            sb.AppendLine($"TOTAL: {total:C2}".PadLeft(36));
+            sb.AppendLine("\nGracias por su compra!");
+            sb.AppendLine("*************************************");
+
+            try
+            {
+                File.WriteAllText(filePath, sb.ToString());
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al guardar ticket: {ex.Message}");
+                return "Error (no se pudo guardar el ticket)";
+            }
+        }
+
+        // ⬇⬇ --- MÉTODO 'LOGOUT' (CORREGIDO) --- ⬇⬇
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            // (Este método no cambia)
             var dialog = new ContentDialog
             {
                 Title = "Cerrar sesión",
                 Content = "¿Seguro que quieres cerrar sesión?",
                 PrimaryButtonText = "Sí",
                 CloseButtonText = "Cancelar",
+                // ¡ESTA LÍNEA ES LA CORRECCIÓN!
                 XamlRoot = this.Content.XamlRoot
             };
             var result = await dialog.ShowAsync();
@@ -210,12 +284,10 @@ namespace proyectoRefaccionaria
 
         private void ActualizarCartListView()
         {
-            // (Este método no cambia)
             CartListView.ItemsSource = new List<CartItem>(cart);
         }
     }
 
-    // (La clase CartItem no cambia)
     public class CartItem
     {
         public SparePart Part

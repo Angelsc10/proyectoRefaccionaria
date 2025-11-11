@@ -11,7 +11,7 @@ namespace proyectoRefaccionaria
         public RegisterPartWindow()
         {
             this.InitializeComponent();
-            this.SystemBackdrop = new MicaBackdrop();
+            this.Maximize();
         }
 
         // --- Método Guardar (Sin cambios) ---
@@ -67,6 +67,13 @@ namespace proyectoRefaccionaria
             reportWindow.Activate();
         }
 
+        // --- Método Gestionar Usuarios (Sin cambios) ---
+        private void GestionarUsuarios_Click(object sender, RoutedEventArgs e)
+        {
+            var userWindow = new UserManagementWindow();
+            userWindow.Activate();
+        }
+
         // --- Método Logout (Sin cambios) ---
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
@@ -81,10 +88,10 @@ namespace proyectoRefaccionaria
         }
 
         // ⬇⬇ MÉTODO NUEVO ⬇⬇
-        private void GestionarUsuarios_Click(object sender, RoutedEventArgs e)
+        private void GestionarClientes_Click(object sender, RoutedEventArgs e)
         {
-            var userWindow = new UserManagementWindow(); // ¡La nueva ventana!
-            userWindow.Activate();
+            var customerWindow = new CustomerManagementWindow(); // ¡La nueva ventana!
+            customerWindow.Activate();
         }
     }
 }

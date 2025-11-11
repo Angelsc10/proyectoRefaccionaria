@@ -15,8 +15,11 @@
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="ColorPalette.xaml" />
+    <None Remove="CustomerManagementWindow.xaml" />
     <None Remove="EditPartWindow.xaml" />
     <None Remove="RegisterPartWindow.xaml" />
+    <None Remove="RegisterUserWindow.xaml" />
     <None Remove="SalesReportWindow.xaml" />
     <None Remove="SparePartsWindow.xaml" />
     <None Remove="UserManagementWindow.xaml" />
@@ -43,6 +46,24 @@
 
   <ItemGroup>
     <ProjectReference Include="..\proyectoRefaccionaria.Core\proyectoRefaccionaria.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="ColorPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="RegisterUserWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="CustomerManagementWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

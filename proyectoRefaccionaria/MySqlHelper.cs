@@ -6,7 +6,8 @@ using System.Linq;
 
 namespace proyectoRefaccionaria
 {
-    // --- CLASES PARA REPORTES Y GESTIÓN (Añadida 'Usuario') ---
+    // --- CLASES DE MODELO (Añadida 'Cliente') ---
+
     public class VentaReporte
     {
         public int VentaID
@@ -40,9 +41,6 @@ namespace proyectoRefaccionaria
         public double Subtotal => CantidadVendida * PrecioEnLaVenta;
     }
 
-    // ⬇⬇ CLASE NUEVA ⬇⬇
-    // Clase para el DataGrid de gestión de usuarios
-    // (Omitimos el Password por seguridad, no queremos mostrarlo en la UI)
     public class Usuario
     {
         public int UsuarioID
@@ -56,6 +54,37 @@ namespace proyectoRefaccionaria
         public string Rol
         {
             get; set;
+        }
+    }
+
+    // ⬇⬇ CLASE NUEVA ⬇⬇
+    public class Cliente
+    {
+        public int ClienteID
+        {
+            get; set;
+        }
+        public string Nombre
+        {
+            get; set;
+        }
+        public string Telefono
+        {
+            get; set;
+        }
+        public string Email
+        {
+            get; set;
+        }
+        public string RFC
+        {
+            get; set;
+        }
+
+        // Esto es para que el ComboBox muestre el nombre
+        public override string ToString()
+        {
+            return Nombre;
         }
     }
 
@@ -197,27 +226,51 @@ namespace proyectoRefaccionaria
             return null;
         }
 
-        // --- MÉTODOS DE VENTA Y REPORTE (Sin cambios) ---
-        public static bool RegistrarVenta(List<CartItem> cart)
+        // ⬇⬇ --- MÉTODO DE VENTA ACTUALIZADO (Acepta ClienteID) --- ⬇⬇
+        /// <summary>
+        /// Registra una venta completa y actualiza el stock.
+        /// </summary>
+        /// <param name="clienteId">ID del cliente, o -1 si es venta de mostrador.</param>
+        /// <returns>Devuelve el nuevo VentaID si tiene éxito, o -1 si falla.</returns>
+        public static int RegistrarVenta(List<CartItem> cart, int clienteId)
         {
             MySqlTransaction transaction = null;
+            long ventaId = -1;
+
             try
             {
                 using (var connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
                     transaction = connection.BeginTransaction();
+
                     double totalVenta = cart.Sum(item => item.Subtotal);
-                    string ventaQuery = "INSERT INTO Ventas (TotalVenta) VALUES (@total)";
-                    long ventaId;
+
+                    // 1. Consulta actualizada para incluir ClienteID
+                    string ventaQuery = "INSERT INTO Ventas (TotalVenta, ClienteID) VALUES (@total, @clienteId)";
                     using (var cmd = new MySqlCommand(ventaQuery, connection, transaction))
                     {
                         cmd.Parameters.AddWithValue("@total", totalVenta);
+
+                        // 2. Lógica para manejar "Venta de mostrador" (sin cliente)
+                        // Si clienteId no es válido (ej. -1), guarda NULL en la BD
+                        if (clienteId > 0)
+                        {
+                            cmd.Parameters.AddWithValue("@clienteId", clienteId);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@clienteId", DBNull.Value);
+                        }
+
                         cmd.ExecuteNonQuery();
                         ventaId = cmd.LastInsertedId;
                     }
+
+                    // 3. El resto de la transacción (detalles y stock) no cambia
                     string detalleQuery = "INSERT INTO DetalleVenta (VentaID, RefaccionID, CantidadVendida, PrecioEnLaVenta) VALUES (@ventaId, @refaccionId, @cantidad, @precio)";
                     string stockQuery = "UPDATE spareparts SET Stock = Stock - @cantidad WHERE Id = @refaccionId";
+
                     foreach (var item in cart)
                     {
                         using (var cmd = new MySqlCommand(detalleQuery, connection, transaction))
@@ -235,18 +288,20 @@ namespace proyectoRefaccionaria
                             cmd.ExecuteNonQuery();
                         }
                     }
+
                     transaction.Commit();
-                    return true;
+                    return (int)ventaId;
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error al registrar la venta (revirtiendo transacción): {ex.Message}");
                 transaction?.Rollback();
-                return false;
+                return -1;
             }
         }
 
+        // --- MÉTODOS DE REPORTE (Sin cambios) ---
         public static List<VentaReporte> GetVentasReporte()
         {
             var ventas = new List<VentaReporte>();
@@ -316,11 +371,7 @@ namespace proyectoRefaccionaria
             return detalles;
         }
 
-        // ⬇⬇ --- MÉTODOS NUEVOS PARA GESTIÓN DE USUARIOS --- ⬇⬇
-
-        /// <summary>
-        /// Obtiene todos los usuarios (sin contraseña) para el DataGrid.
-        /// </summary>
+        // --- MÉTODOS DE USUARIOS (Sin cambios) ---
         public static List<Usuario> GetAllUsers()
         {
             var usuarios = new List<Usuario>();
@@ -352,10 +403,6 @@ namespace proyectoRefaccionaria
             return usuarios;
         }
 
-        /// <summary>
-        /// Añade un nuevo usuario a la base de datos.
-        /// </summary>
-        /// <returns>Devuelve true si fue exitoso, false si falló (ej: usuario ya existe).</returns>
         public static bool AddUser(string username, string password, string rol)
         {
             try
@@ -376,7 +423,6 @@ namespace proyectoRefaccionaria
             }
             catch (MySqlException ex)
             {
-                // Código 1062 es para 'Entrada duplicada' (usuario ya existe)
                 Debug.WriteLine($"Error MySQL al añadir usuario (puede ser duplicado): {ex.Message}");
                 return false;
             }
@@ -387,9 +433,6 @@ namespace proyectoRefaccionaria
             }
         }
 
-        /// <summary>
-        /// Elimina un usuario de la base de datos por su ID.
-        /// </summary>
         public static void DeleteUser(int usuarioId)
         {
             try
@@ -408,6 +451,112 @@ namespace proyectoRefaccionaria
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error al eliminar usuario: {ex.Message}");
+            }
+        }
+
+        // ⬇⬇ --- MÉTODOS NUEVOS PARA GESTIÓN DE CLIENTES --- ⬇⬇
+
+        /// <summary>
+        /// Obtiene todos los clientes de la base de datos.
+        /// </summary>
+        public static List<Cliente> GetAllClientes()
+        {
+            var clientes = new List<Cliente>();
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT ClienteID, Nombre, Telefono, Email, RFC FROM Clientes ORDER BY Nombre";
+                    using (var cmd = new MySqlCommand(query, connection))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            clientes.Add(new Cliente
+                            {
+                                ClienteID = reader.GetInt32("ClienteID"),
+                                Nombre = reader.GetString("Nombre"),
+                                Telefono = reader.IsDBNull(reader.GetOrdinal("Telefono")) ? string.Empty : reader.GetString("Telefono"),
+                                Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? string.Empty : reader.GetString("Email"),
+                                RFC = reader.IsDBNull(reader.GetOrdinal("RFC")) ? string.Empty : reader.GetString("RFC")
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al obtener clientes: {ex.Message}");
+            }
+            return clientes;
+        }
+
+        /// <summary>
+        /// Añade un nuevo cliente a la base de datos.
+        /// </summary>
+        /// <returns>Devuelve true si fue exitoso, false si falló.</returns>
+        public static bool AddCliente(string nombre, string telefono, string email, string rfc)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Clientes (Nombre, Telefono, Email, RFC) VALUES (@nombre, @telefono, @email, @rfc)";
+                    using (var cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@nombre", nombre);
+                        cmd.Parameters.AddWithValue("@telefono", (object)telefono ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@email", (object)email ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@rfc", (object)rfc ?? DBNull.Value);
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error general al añadir cliente: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Elimina un cliente de la base de datos.
+        /// </summary>
+        /// <returns>Devuelve true si fue exitoso, false si falló (ej. el cliente tiene ventas asociadas).</returns>
+        public static bool DeleteCliente(int clienteId)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "DELETE FROM Clientes WHERE ClienteID = @id";
+                    using (var cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@id", clienteId);
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                // Error 1451: Violación de llave foránea (el cliente tiene ventas)
+                if (ex.Number == 1451)
+                {
+                    Debug.WriteLine("No se puede eliminar cliente, tiene ventas asociadas.");
+                    return false;
+                }
+                Debug.WriteLine($"Error MySQL al eliminar cliente: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error general al eliminar cliente: {ex.Message}");
+                return false;
             }
         }
     }

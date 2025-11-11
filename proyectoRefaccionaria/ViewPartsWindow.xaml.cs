@@ -16,8 +16,7 @@ namespace proyectoRefaccionaria
         public ViewPartsWindow()
         {
             this.InitializeComponent();
-            this.SystemBackdrop = new MicaBackdrop();
-
+            this.Maximize();
             CargarRefacciones();
             PoblarFiltroCategorias(); // ⬅️ NUEVA LLAMADA
         }

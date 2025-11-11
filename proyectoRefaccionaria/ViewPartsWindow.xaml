@@ -5,31 +5,50 @@
     xmlns:winuiEx="using:WinUIEx"
     xmlns:local="using:proyectoRefaccionaria"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    Title="Visualización y Gestión de Refacciones"
+    Title="Refaccionaria El Gallito - Inventario"
     Width="900" Height="600">
-    <Grid Padding="20">
+
+    <Grid Padding="20" Background="{StaticResource BackgroundColorSuperDark}">
         <StackPanel Spacing="10">
             <TextBlock Text="Gestión de refacciones"
-                       FontSize="22" FontWeight="Bold" />
+                       FontSize="22" FontWeight="Bold" 
+                       Foreground="{StaticResource PrimaryColor}"/>
 
             <StackPanel Orientation="Horizontal" Spacing="10" 
-                        Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                        Background="{StaticResource BackgroundColorDark}"
                         Padding="10" CornerRadius="8">
-                <TextBox x:Name="FiltroNombre" PlaceholderText="Buscar por nombre..." Width="200"/>
-                <TextBox x:Name="FiltroPrecio" PlaceholderText="Precio máximo..." Width="150"/>
+
+                <TextBox x:Name="FiltroNombre" PlaceholderText="Buscar por nombre..." Width="200"
+                         Foreground="{StaticResource TextControlForeground}"
+                         BorderBrush="{StaticResource PrimaryColor}"
+                         Background="{StaticResource BackgroundColorLight}"/>
+                <TextBox x:Name="FiltroPrecio" PlaceholderText="Precio máximo..." Width="150"
+                         Foreground="{StaticResource TextControlForeground}"
+                         BorderBrush="{StaticResource PrimaryColor}"
+                         Background="{StaticResource BackgroundColorLight}"/>
 
                 <ComboBox x:Name="CategoriaFilterComboBox"
                           PlaceholderText="Filtrar por categoría"
                           Width="180"
-                          SelectionChanged="Filtrar_Click"></ComboBox>
-                <Button x:Name="FiltrarButton" Click="Filtrar_Click">
+                          SelectionChanged="Filtrar_Click"
+                          Foreground="{StaticResource TextColorOnAccent}"
+                          Background="{StaticResource BackgroundColorDark}"
+                          BorderBrush="{StaticResource BackgroundColorDark}"/>
+
+                <Button x:Name="FiltrarButton" Click="Filtrar_Click"
+                        Style="{StaticResource DefaultButtonStyle}"
+                        Background="{StaticResource BackgroundColorDark}"
+                        Foreground="{StaticResource TextColorOnAccent}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Filter"/>
                         <TextBlock Text="Filtrar"/>
                     </StackPanel>
                 </Button>
 
-                <Button x:Name="MostrarTodoButton" Click="MostrarTodo_Click">
+                <Button x:Name="MostrarTodoButton" Click="MostrarTodo_Click"
+                        Style="{StaticResource DefaultButtonStyle}"
+                        Background="{StaticResource BackgroundColorDark}"
+                        Foreground="{StaticResource TextColorOnAccent}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Clear"/>
                         <TextBlock Text="Mostrar todo"/>
@@ -51,7 +70,8 @@
                 <Button x:Name="EliminarButton"
                         Click="Eliminar_Click"
                         Width="250"
-                        Background="IndianRed">
+                        Background="{StaticResource DangerColor}"
+                        Foreground="{StaticResource TextColorOnAccent}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="Delete"/>
                         <TextBlock Text="Eliminar refacción seleccionada"/>
@@ -59,14 +79,15 @@
                 </Button>
             </StackPanel>
 
-
             <controls:DataGrid x:Name="PartsDataGrid"
                                Height="350"
                                Margin="0,10,0,0"
                                AutoGenerateColumns="False"
                                IsReadOnly="True"
                                SelectionMode="Single"
-                               CanUserSortColumns="True">
+                               CanUserSortColumns="True"
+                               Background="{StaticResource BackgroundColorDark}"
+                               Foreground="{StaticResource TextColorOnAccent}">
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                     <controls:DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>

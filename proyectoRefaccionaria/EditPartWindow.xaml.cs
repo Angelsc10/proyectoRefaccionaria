@@ -14,7 +14,7 @@ namespace proyectoRefaccionaria
         public EditPartWindow(SparePart part)
         {
             this.InitializeComponent();
-            this.SystemBackdrop = new MicaBackdrop();
+            this.Maximize();
             this.partToEdit = part;
             LoadData();
         }

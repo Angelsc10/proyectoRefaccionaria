@@ -12,8 +12,7 @@ namespace proyectoRefaccionaria
         public UserManagementWindow()
         {
             this.InitializeComponent();
-            this.SystemBackdrop = new MicaBackdrop(); // Activa Mica
-
+            this.Maximize();
             CargarUsuarios();
         }
 
