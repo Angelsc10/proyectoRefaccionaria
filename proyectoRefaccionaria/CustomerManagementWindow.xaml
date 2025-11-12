@@ -37,17 +37,30 @@
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
 
-            <Button x:Name="EliminarButton"
-                    Click="EliminarCliente_Click"
-                    HorizontalAlignment="Right"
-                    Background="{StaticResource DangerColor}"
-                    Foreground="{StaticResource TextColorOnAccent}"
-                    Width="200">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <SymbolIcon Symbol="Delete"/>
-                    <TextBlock Text="Eliminar Seleccionado"/>
-                </StackPanel>
-            </Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+
+                <Button x:Name="EditarButton"
+                        Click="EditarCliente_Click"
+                        Background="{StaticResource AccentColor}"
+                        Foreground="{StaticResource TextColorOnAccent}"
+                        Width="200">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Edit"/>
+                        <TextBlock Text="Editar Cliente Seleccionado"/>
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="EliminarButton"
+                        Click="EliminarCliente_Click"
+                        Background="{StaticResource DangerColor}"
+                        Foreground="{StaticResource TextColorOnAccent}"
+                        Width="200">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <SymbolIcon Symbol="Delete"/>
+                        <TextBlock Text="Eliminar Seleccionado"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
 
         </StackPanel>
 
@@ -86,11 +99,14 @@
                          Foreground="{StaticResource TextControlForeground}"
                          BorderBrush="{StaticResource PrimaryColor}"
                          Background="{StaticResource BackgroundColorLight}"/>
+
                 <Button x:Name="AgregarButton"
                         Click="AgregarCliente_Click"
                         Style="{StaticResource AccentButtonStyle}"
                         HorizontalAlignment="Stretch"
-                        Background="{StaticResource SuccessColor}"  BorderBrush="{StaticResource SuccessColor}" Margin="0,20,0,0">
+                        Background="{StaticResource SuccessColor}"
+                        BorderBrush="{StaticResource SuccessColor}"
+                        Margin="0,20,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <SymbolIcon Symbol="AddFriend"/>
                         <TextBlock Text="Crear Cliente"/>

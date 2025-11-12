@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace proyectoRefaccionaria
 {
-    // --- CLASES DE MODELO (Añadida 'Cliente') ---
+    // --- CLASES DE MODELO ---
 
     public class VentaReporte
     {
@@ -57,7 +57,6 @@ namespace proyectoRefaccionaria
         }
     }
 
-    // ⬇⬇ CLASE NUEVA ⬇⬇
     public class Cliente
     {
         public int ClienteID
@@ -92,9 +91,11 @@ namespace proyectoRefaccionaria
     // --- CLASE PRINCIPAL DEL HELPER ---
     public static class MySqlHelper
     {
+        // ⚠️ IMPORTANTE: Asegúrate de que esta contraseña sea la correcta en tu laptop.
+        // Si usas XAMPP sin contraseña, cámbiala a: password=;
         private static string connectionString = "server=localhost;database=refaccionaria;user=root;password=1234;";
 
-        // --- MÉTODOS DE REFACCIONES (Sin cambios) ---
+        // --- MÉTODOS DE REFACCIONES ---
         public static List<SparePart> GetAllParts()
         {
             var parts = new List<SparePart>();
@@ -198,7 +199,7 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // --- MÉTODO DE LOGIN (Sin cambios) ---
+        // --- MÉTODO DE LOGIN ---
         public static string ValidarUsuario(string username, string password)
         {
             try
@@ -226,12 +227,7 @@ namespace proyectoRefaccionaria
             return null;
         }
 
-        // ⬇⬇ --- MÉTODO DE VENTA ACTUALIZADO (Acepta ClienteID) --- ⬇⬇
-        /// <summary>
-        /// Registra una venta completa y actualiza el stock.
-        /// </summary>
-        /// <param name="clienteId">ID del cliente, o -1 si es venta de mostrador.</param>
-        /// <returns>Devuelve el nuevo VentaID si tiene éxito, o -1 si falla.</returns>
+        // --- MÉTODO DE VENTA ---
         public static int RegistrarVenta(List<CartItem> cart, int clienteId)
         {
             MySqlTransaction transaction = null;
@@ -246,28 +242,21 @@ namespace proyectoRefaccionaria
 
                     double totalVenta = cart.Sum(item => item.Subtotal);
 
-                    // 1. Consulta actualizada para incluir ClienteID
+                    // 1. Insertar Venta
                     string ventaQuery = "INSERT INTO Ventas (TotalVenta, ClienteID) VALUES (@total, @clienteId)";
                     using (var cmd = new MySqlCommand(ventaQuery, connection, transaction))
                     {
                         cmd.Parameters.AddWithValue("@total", totalVenta);
-
-                        // 2. Lógica para manejar "Venta de mostrador" (sin cliente)
-                        // Si clienteId no es válido (ej. -1), guarda NULL en la BD
                         if (clienteId > 0)
-                        {
                             cmd.Parameters.AddWithValue("@clienteId", clienteId);
-                        }
                         else
-                        {
                             cmd.Parameters.AddWithValue("@clienteId", DBNull.Value);
-                        }
 
                         cmd.ExecuteNonQuery();
                         ventaId = cmd.LastInsertedId;
                     }
 
-                    // 3. El resto de la transacción (detalles y stock) no cambia
+                    // 2. Insertar Detalles y Actualizar Stock
                     string detalleQuery = "INSERT INTO DetalleVenta (VentaID, RefaccionID, CantidadVendida, PrecioEnLaVenta) VALUES (@ventaId, @refaccionId, @cantidad, @precio)";
                     string stockQuery = "UPDATE spareparts SET Stock = Stock - @cantidad WHERE Id = @refaccionId";
 
@@ -295,13 +284,13 @@ namespace proyectoRefaccionaria
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error al registrar la venta (revirtiendo transacción): {ex.Message}");
+                Debug.WriteLine($"Error al registrar la venta: {ex.Message}");
                 transaction?.Rollback();
                 return -1;
             }
         }
 
-        // --- MÉTODOS DE REPORTE (Sin cambios) ---
+        // --- MÉTODOS DE REPORTE ---
         public static List<VentaReporte> GetVentasReporte()
         {
             var ventas = new List<VentaReporte>();
@@ -328,7 +317,7 @@ namespace proyectoRefaccionaria
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error general al obtener reporte de ventas: {ex.Message}");
+                Debug.WriteLine($"Error al obtener reporte: {ex.Message}");
             }
             return ventas;
         }
@@ -366,12 +355,12 @@ namespace proyectoRefaccionaria
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error general al obtener detalle de venta: {ex.Message}");
+                Debug.WriteLine($"Error al obtener detalle: {ex.Message}");
             }
             return detalles;
         }
 
-        // --- MÉTODOS DE USUARIOS (Sin cambios) ---
+        // --- MÉTODOS DE USUARIOS ---
         public static List<Usuario> GetAllUsers()
         {
             var usuarios = new List<Usuario>();
@@ -423,7 +412,7 @@ namespace proyectoRefaccionaria
             }
             catch (MySqlException ex)
             {
-                Debug.WriteLine($"Error MySQL al añadir usuario (puede ser duplicado): {ex.Message}");
+                Debug.WriteLine($"Error MySQL al añadir usuario: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
@@ -454,11 +443,7 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // ⬇⬇ --- MÉTODOS NUEVOS PARA GESTIÓN DE CLIENTES --- ⬇⬇
-
-        /// <summary>
-        /// Obtiene todos los clientes de la base de datos.
-        /// </summary>
+        // --- MÉTODOS DE CLIENTES ---
         public static List<Cliente> GetAllClientes()
         {
             var clientes = new List<Cliente>();
@@ -492,10 +477,6 @@ namespace proyectoRefaccionaria
             return clientes;
         }
 
-        /// <summary>
-        /// Añade un nuevo cliente a la base de datos.
-        /// </summary>
-        /// <returns>Devuelve true si fue exitoso, false si falló.</returns>
         public static bool AddCliente(string nombre, string telefono, string email, string rfc)
         {
             try
@@ -517,15 +498,37 @@ namespace proyectoRefaccionaria
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error general al añadir cliente: {ex.Message}");
+                Debug.WriteLine($"Error al añadir cliente: {ex.Message}");
                 return false;
             }
         }
 
-        /// <summary>
-        /// Elimina un cliente de la base de datos.
-        /// </summary>
-        /// <returns>Devuelve true si fue exitoso, false si falló (ej. el cliente tiene ventas asociadas).</returns>
+        // ⬇⬇ MÉTODO NUEVO: UpdateCliente ⬇⬇
+        public static void UpdateCliente(Cliente cliente)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "UPDATE Clientes SET Nombre = @nombre, Telefono = @telefono, Email = @email, RFC = @rfc WHERE ClienteID = @id";
+                    using (var cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                        cmd.Parameters.AddWithValue("@telefono", (object)cliente.Telefono ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@email", (object)cliente.Email ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@rfc", (object)cliente.RFC ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@id", cliente.ClienteID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al actualizar cliente: {ex.Message}");
+            }
+        }
+
         public static bool DeleteCliente(int clienteId)
         {
             try
@@ -544,7 +547,6 @@ namespace proyectoRefaccionaria
             }
             catch (MySqlException ex)
             {
-                // Error 1451: Violación de llave foránea (el cliente tiene ventas)
                 if (ex.Number == 1451)
                 {
                     Debug.WriteLine("No se puede eliminar cliente, tiene ventas asociadas.");

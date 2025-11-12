@@ -1,0 +1,24 @@
+<winuiEx:WindowEx
+    x:Class="proyectoRefaccionaria.EditCustomerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winuiEx="using:WinUIEx"
+    Title="Refaccionaria El Gallito - Editar Cliente"
+    Width="450" Height="500">
+
+    <Grid Padding="25" Background="{StaticResource BackgroundColorSuperDark}">
+        <StackPanel Spacing="15">
+            <TextBlock Text="Editar Cliente" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}" Margin="0,0,0,10"/>
+
+            <TextBox x:Name="NombreTextBox" Header="Nombre Completo:" Foreground="{StaticResource TextControlForeground}" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource BackgroundColorLight}"/>
+            <TextBox x:Name="TelefonoTextBox" Header="Teléfono:" Foreground="{StaticResource TextControlForeground}" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource BackgroundColorLight}"/>
+            <TextBox x:Name="EmailTextBox" Header="Email:" Foreground="{StaticResource TextControlForeground}" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource BackgroundColorLight}"/>
+            <TextBox x:Name="RfcTextBox" Header="RFC:" Foreground="{StaticResource TextControlForeground}" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource BackgroundColorLight}"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button x:Name="GuardarButton" Click="Guardar_Click" Content="Guardar Cambios" Width="150" Style="{StaticResource AccentButtonStyle}" Background="{StaticResource SuccessColor}" BorderBrush="{StaticResource SuccessColor}"/>
+                <Button x:Name="CancelarButton" Click="Cancelar_Click" Content="Cancelar" Width="120" Style="{StaticResource DefaultButtonStyle}" Background="{StaticResource BackgroundColorDark}" Foreground="{StaticResource TextColorOnAccent}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</winuiEx:WindowEx>

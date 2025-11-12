@@ -8,16 +8,17 @@ namespace proyectoRefaccionaria
 {
     public sealed partial class CustomerManagementWindow : WindowEx
     {
-        // Constructor MODIFICADO: Acepta un parámetro opcional
+        // Constructor que acepta el modo vendedor
         public CustomerManagementWindow(bool modoVendedor = false)
         {
             this.InitializeComponent();
-            this.Maximize();
+            this.Maximize(); // Inicia maximizada
 
-            // Si es modo vendedor, ocultamos el botón de eliminar
+            // Si es modo vendedor, ocultamos las acciones destructivas
             if (modoVendedor)
             {
                 EliminarButton.Visibility = Visibility.Collapsed;
+                EditarButton.Visibility = Visibility.Collapsed; // Opcional: Si quieres que el vendedor tampoco edite
                 this.Title = "Refaccionaria El Gallito - Seleccionar Cliente";
             }
 
@@ -51,6 +52,7 @@ namespace proyectoRefaccionaria
                 var dialog = new ContentDialog { Title = "Éxito", Content = "Cliente creado correctamente.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
 
+                // Limpiar campos
                 NombreTextBox.Text = "";
                 TelefonoTextBox.Text = "";
                 EmailTextBox.Text = "";
@@ -98,6 +100,28 @@ namespace proyectoRefaccionaria
             else
             {
                 var dialog = new ContentDialog { Title = "Ninguna selección", Content = "Por favor selecciona un cliente de la lista para eliminar.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
+                await dialog.ShowAsync();
+            }
+        }
+
+        // Método para Editar Cliente
+        private async void EditarCliente_Click(object sender, RoutedEventArgs e)
+        {
+            if (ClientesDataGrid.SelectedItem is Cliente selectedCliente)
+            {
+                var editWindow = new EditCustomerWindow(selectedCliente);
+
+                // Al cerrar la ventana de edición, recargamos la lista
+                editWindow.Closed += (s, args) =>
+                {
+                    DispatcherQueue.TryEnqueue(() => CargarClientes());
+                };
+
+                editWindow.Activate();
+            }
+            else
+            {
+                var dialog = new ContentDialog { Title = "Selección", Content = "Selecciona un cliente para editar.", CloseButtonText = "OK", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
             }
         }

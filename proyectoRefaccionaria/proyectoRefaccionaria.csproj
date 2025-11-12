@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Remove="ColorPalette.xaml" />
     <None Remove="CustomerManagementWindow.xaml" />
+    <None Remove="EditCustomerWindow.xaml" />
     <None Remove="EditPartWindow.xaml" />
     <None Remove="RegisterPartWindow.xaml" />
     <None Remove="RegisterUserWindow.xaml" />
@@ -46,6 +47,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\proyectoRefaccionaria.Core\proyectoRefaccionaria.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="EditCustomerWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
