@@ -1,33 +1,35 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media; // ⬅️ Para el Mica
+using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using WinUIEx;
 
 namespace proyectoRefaccionaria
 {
-    // ⬇⬇ ¡ASEGÚRATE QUE DIGA 'WindowEx'! ⬇⬇
     public sealed partial class CustomerManagementWindow : WindowEx
     {
-        public CustomerManagementWindow()
+        // Constructor MODIFICADO: Acepta un parámetro opcional
+        public CustomerManagementWindow(bool modoVendedor = false)
         {
             this.InitializeComponent();
             this.Maximize();
+
+            // Si es modo vendedor, ocultamos el botón de eliminar
+            if (modoVendedor)
+            {
+                EliminarButton.Visibility = Visibility.Collapsed;
+                this.Title = "Refaccionaria El Gallito - Seleccionar Cliente";
+            }
+
             CargarClientes();
         }
 
-        /// <summary>
-        /// Carga (o recarga) la lista de clientes desde la BD al DataGrid.
-        /// </summary>
         private void CargarClientes()
         {
             List<Cliente> clientes = MySqlHelper.GetAllClientes();
             ClientesDataGrid.ItemsSource = clientes;
         }
 
-        /// <summary>
-        /// Se activa al hacer clic en 'Crear Cliente'.
-        /// </summary>
         private async void AgregarCliente_Click(object sender, RoutedEventArgs e)
         {
             string nombre = NombreTextBox.Text.Trim();
@@ -35,7 +37,6 @@ namespace proyectoRefaccionaria
             string email = EmailTextBox.Text.Trim();
             string rfc = RfcTextBox.Text.Trim();
 
-            // Validación (solo el nombre es obligatorio)
             if (string.IsNullOrEmpty(nombre))
             {
                 var dialog = new ContentDialog { Title = "Campo obligatorio", Content = "El nombre del cliente no puede estar vacío.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
@@ -43,7 +44,6 @@ namespace proyectoRefaccionaria
                 return;
             }
 
-            // Llama al Helper para añadir el cliente
             bool exito = MySqlHelper.AddCliente(nombre, telefono, email, rfc);
 
             if (exito)
@@ -51,13 +51,11 @@ namespace proyectoRefaccionaria
                 var dialog = new ContentDialog { Title = "Éxito", Content = "Cliente creado correctamente.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await dialog.ShowAsync();
 
-                // Limpia el formulario
                 NombreTextBox.Text = "";
                 TelefonoTextBox.Text = "";
                 EmailTextBox.Text = "";
                 RfcTextBox.Text = "";
 
-                // Recarga la lista
                 CargarClientes();
             }
             else
@@ -67,14 +65,10 @@ namespace proyectoRefaccionaria
             }
         }
 
-        /// <summary>
-        /// Se activa al hacer clic en 'Eliminar Seleccionado'.
-        /// </summary>
         private async void EliminarCliente_Click(object sender, RoutedEventArgs e)
         {
             if (ClientesDataGrid.SelectedItem is Cliente selectedCliente)
             {
-                // Pide confirmación
                 var confirmDialog = new ContentDialog
                 {
                     Title = "Confirmar eliminación",
@@ -88,16 +82,14 @@ namespace proyectoRefaccionaria
 
                 if (result == ContentDialogResult.Primary)
                 {
-                    // Llama al Helper para eliminar
                     bool exito = MySqlHelper.DeleteCliente(selectedCliente.ClienteID);
 
                     if (exito)
                     {
-                        CargarClientes(); // Recarga la lista si fue exitoso
+                        CargarClientes();
                     }
                     else
                     {
-                        // Esto falla si el cliente tiene ventas
                         var dialog = new ContentDialog { Title = "Error", Content = "No se pudo eliminar al cliente. Asegúrate de que no tenga ventas asociadas.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                         await dialog.ShowAsync();
                     }

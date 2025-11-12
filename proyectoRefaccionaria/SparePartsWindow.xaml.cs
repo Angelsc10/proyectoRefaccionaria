@@ -77,8 +77,17 @@ namespace proyectoRefaccionaria
 
         private void AddCustomer_Click(object sender, RoutedEventArgs e)
         {
-            var customerWindow = new CustomerManagementWindow();
-            customerWindow.Closed += (s, args) => { DispatcherQueue.TryEnqueue(() => { PoblarClientesComboBox(); }); };
+            // Pasamos 'true' para activar el Modo Vendedor (sin borrar)
+            var customerWindow = new CustomerManagementWindow(true);
+
+            customerWindow.Closed += (s, args) =>
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    PoblarClientesComboBox();
+                });
+            };
+
             customerWindow.Activate();
         }
 

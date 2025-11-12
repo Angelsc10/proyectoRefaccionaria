@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using WinUIEx;
 using Microsoft.UI.Xaml.Media;
+using System.Collections.Generic; // ⬅️ Necesario para List
+using System.Linq; // ⬅️ Necesario por si usamos OrderBy
 
 namespace proyectoRefaccionaria
 {
@@ -12,9 +14,19 @@ namespace proyectoRefaccionaria
         {
             this.InitializeComponent();
             this.Maximize();
+            CargarInventario(); // ⬅️ Carga inicial
         }
 
-        // --- Método Guardar (Sin cambios) ---
+        // ⬇⬇ MÉTODO NUEVO ⬇⬇
+        private void CargarInventario()
+        {
+            // Obtenemos todas las partes y las mostramos en el grid
+            var lista = MySqlHelper.GetAllParts();
+            // Opcional: Mostrar las últimas agregadas primero (si el ID es autoincremental)
+            // lista = lista.OrderByDescending(p => p.Id).ToList(); 
+            MiniInventarioGrid.ItemsSource = lista;
+        }
+
         private async void Guardar_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(NombreTextBox.Text) || string.IsNullOrWhiteSpace(PrecioTextBox.Text))
@@ -47,34 +59,39 @@ namespace proyectoRefaccionaria
             var successDialog = new ContentDialog { Title = "Éxito", Content = "Refacción registrada correctamente.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
             await successDialog.ShowAsync();
 
+            // Limpiar campos
             NombreTextBox.Text = "";
             PrecioTextBox.Text = "";
             StockTextBox.Value = 0;
             CategoriaComboBox.SelectedIndex = -1;
+
+            CargarInventario(); // ⬅️ Recarga la tabla para mostrar el nuevo producto
         }
 
-        // --- Método Ver Refacciones (Sin cambios) ---
         private void VerRefacciones_Click(object sender, RoutedEventArgs e)
         {
             var viewWindow = new ViewPartsWindow();
             viewWindow.Activate();
         }
 
-        // --- Método Ver Reportes (Sin cambios) ---
         private void VerReportes_Click(object sender, RoutedEventArgs e)
         {
             var reportWindow = new SalesReportWindow();
             reportWindow.Activate();
         }
 
-        // --- Método Gestionar Usuarios (Sin cambios) ---
         private void GestionarUsuarios_Click(object sender, RoutedEventArgs e)
         {
             var userWindow = new UserManagementWindow();
             userWindow.Activate();
         }
 
-        // --- Método Logout (Sin cambios) ---
+        private void GestionarClientes_Click(object sender, RoutedEventArgs e)
+        {
+            var customerWindow = new CustomerManagementWindow();
+            customerWindow.Activate();
+        }
+
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog
@@ -83,8 +100,6 @@ namespace proyectoRefaccionaria
                 Content = "¿Seguro que quieres cerrar sesión?",
                 PrimaryButtonText = "Sí",
                 CloseButtonText = "Cancelar",
-
-                // ⬇⬇ ¡AÑADE ESTA LÍNEA! ⬇⬇
                 XamlRoot = this.Content.XamlRoot
             };
 
@@ -95,13 +110,6 @@ namespace proyectoRefaccionaria
                 login.Activate();
                 this.Close();
             }
-        }
-
-        // ⬇⬇ MÉTODO NUEVO ⬇⬇
-        private void GestionarClientes_Click(object sender, RoutedEventArgs e)
-        {
-            var customerWindow = new CustomerManagementWindow(); // ¡La nueva ventana!
-            customerWindow.Activate();
         }
     }
 }
