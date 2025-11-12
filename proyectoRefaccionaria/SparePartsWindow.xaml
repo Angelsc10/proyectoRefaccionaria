@@ -95,10 +95,7 @@
                                                HorizontalAlignment="Right"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
                                         <TextBlock Text="Stock:" FontSize="12" Foreground="{StaticResource TextColorOnAccent}" Opacity="0.7"/>
-                                        <TextBlock Text="{Binding Stock}" 
-                                                   FontSize="12" 
-                                                   FontWeight="Bold" 
-                                                   Foreground="{Binding Stock, Converter={StaticResource StockToColorConverter}}"/>
+                                        <TextBlock Text="{Binding Stock}" FontSize="12" FontWeight="Bold" Foreground="{Binding Stock, Converter={StaticResource StockToColorConverter}}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Grid>
@@ -107,12 +104,16 @@
                 </ListView>
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10">
+
                     <muxc:NumberBox x:Name="QuantityNumberBox"
                                     Value="1" Minimum="1"
                                     SpinButtonPlacementMode="Compact"
                                     SmallChange="1" LargeChange="5"
                                     Header="Cantidad"
                                     Width="100"
+                                    AcceptsExpression="False" 
+                                    ValidationMode="InvalidInputOverwritten"
+                                    PreviewKeyDown="QuantityNumberBox_PreviewKeyDown"
                                     Foreground="{StaticResource TextControlForeground}"
                                     BorderBrush="{StaticResource PrimaryColor}"
                                     Background="{StaticResource BackgroundColorLight}"/>
@@ -121,7 +122,8 @@
                             Width="180"
                             VerticalAlignment="Bottom"
                             Style="{StaticResource AccentButtonStyle}"
-                            Background="{StaticResource SuccessColor}"  BorderBrush="{StaticResource SuccessColor}">
+                            Background="{StaticResource SuccessColor}"
+                            BorderBrush="{StaticResource SuccessColor}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <SymbolIcon Symbol="Add"/>
                             <TextBlock Text="Agregar al carrito"/>
@@ -198,6 +200,19 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Spacing="10">
+                        <Button x:Name="ConfirmPurchaseButton" 
+                                Click="ConfirmPurchase_Click" 
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Background="{StaticResource SuccessColor}"
+                                BorderBrush="{StaticResource SuccessColor}"
+                                Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Shop"/>
+                                <TextBlock Text="Confirmar compra"/>
+                            </StackPanel>
+                        </Button>
+
                         <Button x:Name="RemoveFromCartButton" 
                                 Click="RemoveFromCart_Click" 
                                 HorizontalAlignment="Stretch"
@@ -206,17 +221,6 @@
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <SymbolIcon Symbol="Remove"/>
                                 <TextBlock Text="Quitar del carrito"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button x:Name="ConfirmPurchaseButton" 
-                                Click="ConfirmPurchase_Click" 
-                                HorizontalAlignment="Stretch"
-                                Style="{StaticResource AccentButtonStyle}"
-                                Background="{StaticResource SuccessColor}"  BorderBrush="{StaticResource SuccessColor}" Margin="0,10,0,0">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <SymbolIcon Symbol="Shop"/>
-                                <TextBlock Text="Confirmar compra"/>
                             </StackPanel>
                         </Button>
 
