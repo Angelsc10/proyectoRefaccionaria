@@ -3,7 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:winuiEx="using:WinUIEx"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls" 
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:local="using:proyectoRefaccionaria" 
     Title="Refaccionaria El Gallito - Punto de Venta"
     Width="900" Height="650">
 
@@ -66,10 +67,41 @@
                 <ListView x:Name="PartsListView"
                           Grid.Row="2"
                           SelectionMode="Single"
-                          DisplayMemberPath="Nombre"
+                          Margin="0,10,0,10"
                           Background="{StaticResource BackgroundColorDark}"
-                          Foreground="{StaticResource TextColorOnAccent}"
-                          Margin="0,10,0,10"/>
+                          BorderBrush="{StaticResource BackgroundColorDark}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="10" BorderBrush="#33FFFFFF" BorderThickness="0,0,0,1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Nombre}" 
+                                               FontSize="16" FontWeight="Bold" 
+                                               Foreground="{StaticResource TextColorOnAccent}"/>
+                                    <TextBlock Text="{Binding Categoria}" 
+                                               FontSize="12" Opacity="0.7" 
+                                               Foreground="{StaticResource TextColorOnAccent}"
+                                               Margin="0,2,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Precio, Converter={StaticResource CurrencyConverter}}" 
+                                               FontSize="18" FontWeight="Bold" 
+                                               Foreground="{StaticResource AccentColor}" 
+                                               HorizontalAlignment="Right"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
+                                        <TextBlock Text="Stock:" FontSize="12" Foreground="{StaticResource TextColorOnAccent}" Opacity="0.7"/>
+                                        <TextBlock Text="{Binding Stock}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SuccessColor}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10">
                     <muxc:NumberBox x:Name="QuantityNumberBox"
@@ -93,6 +125,7 @@
                     </Button>
                 </StackPanel>
             </Grid>
+
             <Border Grid.Column="1" 
                     Background="{StaticResource BackgroundColorDark}"
                     Padding="15" CornerRadius="8" Margin="10,0,0,0">
@@ -102,6 +135,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
@@ -115,7 +149,7 @@
                                    Foreground="{StaticResource TextColorOnAccent}"/>
                         <ComboBox x:Name="ClienteComboBox"
                                   PlaceholderText="Seleccionar un cliente..."
-                                  Width="Auto"
+                                  HorizontalAlignment="Stretch"
                                   Foreground="{StaticResource TextColorOnAccent}"
                                   Background="{StaticResource BackgroundColorDark}"
                                   BorderBrush="{StaticResource BackgroundColorDark}"/>
@@ -135,12 +169,31 @@
                     <ListView x:Name="CartListView"
                               Grid.Row="2"
                               SelectionMode="Single"
-                              DisplayMemberPath="DisplayName"
                               Margin="0,10,0,10"
                               Background="{StaticResource BackgroundColorDark}"
-                              Foreground="{StaticResource TextColorOnAccent}"/>
+                              BorderBrush="{StaticResource BackgroundColorDark}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Quantity}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Part.Nombre}" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextColorOnAccent}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Subtotal, Converter={StaticResource CurrencyConverter}}" FontWeight="SemiBold" Foreground="{StaticResource TextColorOnAccent}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
 
-                    <StackPanel Grid.Row="3" Spacing="10">
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                        <TextBlock Text="TOTAL: " FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextColorOnAccent}"/>
+                        <TextBlock x:Name="TotalTextBlock" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Spacing="10">
                         <Button x:Name="RemoveFromCartButton" 
                                 Click="RemoveFromCart_Click" 
                                 HorizontalAlignment="Stretch"
@@ -176,7 +229,6 @@
                             </StackPanel>
                         </Button>
                     </StackPanel>
-
                 </Grid>
             </Border>
         </Grid>

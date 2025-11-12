@@ -21,13 +21,14 @@ namespace proyectoRefaccionaria
         public SparePartsWindow()
         {
             this.InitializeComponent();
+            this.SystemBackdrop = new MicaBackdrop();
             this.Maximize();
+
             CargarRefacciones();
             PoblarFiltroCategorias();
             PoblarClientesComboBox();
         }
 
-        // --- MÉTODOS DE FILTRO DE REFACCIONES (Sin cambios) ---
         private void CargarRefacciones()
         {
             allParts = MySqlHelper.GetAllParts();
@@ -45,12 +46,7 @@ namespace proyectoRefaccionaria
 
             CategoriaFilterComboBox.Items.Clear();
             CategoriaFilterComboBox.Items.Add(_mostrarTodas);
-
-            foreach (var cat in categorias)
-            {
-                CategoriaFilterComboBox.Items.Add(cat);
-            }
-
+            foreach (var cat in categorias) CategoriaFilterComboBox.Items.Add(cat);
             CategoriaFilterComboBox.SelectedItem = _mostrarTodas;
         }
 
@@ -63,53 +59,29 @@ namespace proyectoRefaccionaria
         {
             string filtroCategoria = CategoriaFilterComboBox.SelectedItem?.ToString();
             List<SparePart> filtrado;
-
             if (string.IsNullOrEmpty(filtroCategoria) || filtroCategoria == _mostrarTodas)
-            {
                 filtrado = allParts.Where(p => p.Stock > 0).ToList();
-            }
             else
-            {
                 filtrado = allParts.Where(p => p.Categoria == filtroCategoria && p.Stock > 0).ToList();
-            }
-
             PartsListView.ItemsSource = filtrado;
         }
 
-        // --- MÉTODO NUEVO: Cargar Clientes ---
         private void PoblarClientesComboBox()
         {
             List<Cliente> clientes = MySqlHelper.GetAllClientes();
-
             ClienteComboBox.Items.Clear();
             ClienteComboBox.Items.Add(_clienteAnonimo);
-
-            foreach (var cliente in clientes)
-            {
-                ClienteComboBox.Items.Add(cliente);
-            }
-
+            foreach (var cliente in clientes) ClienteComboBox.Items.Add(cliente);
             ClienteComboBox.SelectedItem = _clienteAnonimo;
         }
 
-        // --- MÉTODO NUEVO: Botón Añadir Cliente ---
         private void AddCustomer_Click(object sender, RoutedEventArgs e)
         {
             var customerWindow = new CustomerManagementWindow();
-
-            customerWindow.Closed += (s, args) =>
-            {
-                DispatcherQueue.TryEnqueue(() =>
-                {
-                    PoblarClientesComboBox();
-                });
-            };
-
+            customerWindow.Closed += (s, args) => { DispatcherQueue.TryEnqueue(() => { PoblarClientesComboBox(); }); };
             customerWindow.Activate();
         }
 
-
-        // --- MÉTODOS DEL CARRITO (Sin cambios) ---
         private async void AddToCart_Click(object sender, RoutedEventArgs e)
         {
             if (PartsListView.SelectedItem is SparePart selectedPart)
@@ -124,23 +96,17 @@ namespace proyectoRefaccionaria
                     var dialog = new ContentDialog
                     {
                         Title = "Stock insuficiente",
-                        Content = $"No puedes agregar {quantityToAdd} más.\n" +
-                                  $"Solo quedan {selectedPart.Stock} en inventario, y ya tienes {currentQuantityInCart} en tu carrito.",
+                        Content = $"No puedes agregar {quantityToAdd} más.\nSolo quedan {selectedPart.Stock} en inventario.",
                         CloseButtonText = "Aceptar",
-                        XamlRoot = this.Content.XamlRoot // ⬅️ Este diálogo SÍ lo tenía
+                        XamlRoot = this.Content.XamlRoot // CORREGIDO
                     };
                     await dialog.ShowAsync();
                     return;
                 }
 
-                if (existingItem != null)
-                {
-                    existingItem.Quantity += quantityToAdd;
-                }
-                else
-                {
-                    cart.Add(new CartItem { Part = selectedPart, Quantity = quantityToAdd });
-                }
+                if (existingItem != null) existingItem.Quantity += quantityToAdd;
+                else cart.Add(new CartItem { Part = selectedPart, Quantity = quantityToAdd });
+
                 ActualizarCartListView();
             }
         }
@@ -154,7 +120,6 @@ namespace proyectoRefaccionaria
             }
         }
 
-        // --- MÉTODO 'CONFIRMAR COMPRA' (MODIFICADO) ---
         private async void ConfirmPurchase_Click(object sender, RoutedEventArgs e)
         {
             if (cart.Count == 0)
@@ -170,19 +135,15 @@ namespace proyectoRefaccionaria
                 var freshPart = freshPartsList.FirstOrDefault(p => p.Id == itemInCart.Part.Id);
                 if (freshPart == null || itemInCart.Quantity > freshPart.Stock)
                 {
-                    var errorDialog = new ContentDialog { Title = "¡Venta Fallida! Stock modificado", Content = $"Lo sentimos, mientras comprabas, el stock de '{itemInCart.Part.Nombre}' cambió. " + $"Solo quedan {freshPart?.Stock ?? 0}. \n\nSe vaciará tu carrito. Por favor, vuelve a intentarlo.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
+                    var errorDialog = new ContentDialog { Title = "¡Venta Fallida!", Content = "El stock ha cambiado. Intente de nuevo.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                     await errorDialog.ShowAsync();
-                    cart.Clear();
-                    ActualizarCartListView();
-                    CargarRefacciones();
-                    PoblarFiltroCategorias();
+                    cart.Clear(); ActualizarCartListView(); CargarRefacciones(); PoblarFiltroCategorias();
                     return;
                 }
             }
 
             int clienteIdParaVenta = -1;
             string nombreCliente = _clienteAnonimo.Nombre;
-
             if (ClienteComboBox.SelectedItem is Cliente selectedCliente)
             {
                 clienteIdParaVenta = selectedCliente.ClienteID;
@@ -199,21 +160,16 @@ namespace proyectoRefaccionaria
                 var successDialog = new ContentDialog
                 {
                     Title = "Compra confirmada",
-                    Content = $"La compra (Venta ID: {ventaId}) para {nombreCliente} se ha registrado con éxito. Total: ${total:F2}\n\nSe guardó un ticket en: {ticketPath}",
+                    Content = $"Venta ID: {ventaId} para {nombreCliente}.\nTotal: ${total:F2}\nTicket guardado en escritorio.",
                     CloseButtonText = "Aceptar",
-                    XamlRoot = this.Content.XamlRoot
+                    XamlRoot = this.Content.XamlRoot // CORREGIDO
                 };
                 await successDialog.ShowAsync();
-
-                cart.Clear();
-                ActualizarCartListView();
-                CargarRefacciones();
-                PoblarFiltroCategorias();
-                PoblarClientesComboBox();
+                cart.Clear(); ActualizarCartListView(); CargarRefacciones(); PoblarFiltroCategorias();
             }
             else
             {
-                var errorDialog = new ContentDialog { Title = "Error en la Venta", Content = "No se pudo registrar la venta. La base de datos revirtió los cambios. El stock no ha sido modificado. Por favor, intenta de nuevo.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
+                var errorDialog = new ContentDialog { Title = "Error", Content = "No se pudo registrar la venta.", CloseButtonText = "Aceptar", XamlRoot = this.Content.XamlRoot };
                 await errorDialog.ShowAsync();
             }
         }
@@ -223,45 +179,24 @@ namespace proyectoRefaccionaria
             string fileName = $"Venta_{ventaId}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string filePath = Path.Combine(desktopPath, fileName);
-
             var sb = new StringBuilder();
             sb.AppendLine("*************************************");
-            sb.AppendLine("      REFACCIONARIA EL GALLITO     ");
+            sb.AppendLine("     REFACCIONARIA \"EL GALLITO\"     ");
             sb.AppendLine("*************************************");
             sb.AppendLine($"Venta ID: {ventaId}");
             sb.AppendLine($"Fecha: {DateTime.Now:g}");
             sb.AppendLine($"Cliente: {nombreCliente}");
             sb.AppendLine("-------------------------------------");
-            sb.AppendLine("Cant.  Producto              Subtotal");
-            sb.AppendLine("-------------------------------------");
-
             foreach (var item in carrito)
             {
-                string nombre = item.Part.Nombre.Length > 20 ? item.Part.Nombre.Substring(0, 20) : item.Part.Nombre.PadRight(20);
-                string cantidad = item.Quantity.ToString().PadLeft(3);
-                string subtotal = item.Subtotal.ToString("C2").PadLeft(10);
-
-                sb.AppendLine($"{cantidad}   {nombre}  {subtotal}");
+                sb.AppendLine($"{item.Quantity} x {item.Part.Nombre} - {item.Subtotal:C2}");
             }
-
             sb.AppendLine("-------------------------------------");
-            sb.AppendLine($"TOTAL: {total:C2}".PadLeft(36));
-            sb.AppendLine("\nGracias por su compra!");
-            sb.AppendLine("*************************************");
-
-            try
-            {
-                File.WriteAllText(filePath, sb.ToString());
-                return filePath;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error al guardar ticket: {ex.Message}");
-                return "Error (no se pudo guardar el ticket)";
-            }
+            sb.AppendLine($"TOTAL: {total:C2}");
+            try { File.WriteAllText(filePath, sb.ToString()); return filePath; }
+            catch { return "Error"; }
         }
 
-        // ⬇⬇ --- MÉTODO 'LOGOUT' (CORREGIDO) --- ⬇⬇
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog
@@ -270,8 +205,7 @@ namespace proyectoRefaccionaria
                 Content = "¿Seguro que quieres cerrar sesión?",
                 PrimaryButtonText = "Sí",
                 CloseButtonText = "Cancelar",
-                // ¡ESTA LÍNEA ES LA CORRECCIÓN!
-                XamlRoot = this.Content.XamlRoot
+                XamlRoot = this.Content.XamlRoot // CORREGIDO
             };
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
@@ -285,6 +219,7 @@ namespace proyectoRefaccionaria
         private void ActualizarCartListView()
         {
             CartListView.ItemsSource = new List<CartItem>(cart);
+            if (TotalTextBlock != null) TotalTextBlock.Text = cart.Sum(i => i.Subtotal).ToString("C2");
         }
     }
 
